@@ -1,16 +1,13 @@
 # Skriptorium — Projekt-Dokumentation
 
-Version: 2.0  
-Aktualisiert: 25.02.2026
+Version: 2.1 | Aktualisiert: 25.02.2026
 
 ---
 
 # Projektübersicht
 
 **Skriptorium** ist ein webbasiertes Schreib- und Organisationswerkzeug für Autor:innen.  
-Es kombiniert Szenenverwaltung, Strukturplanung, Timeline-Logik, Beat-Planung und Weltkarte in einer einzigen HTML-Datei — ohne Server, ohne Installation.
-
-Ziel: komplexe Geschichten strukturiert, chronologisch und plot-orientiert planen.
+Szenenverwaltung, Strukturplanung, Timeline-Logik, Beat-Planung, Weltkarte und Musik — alles in einer HTML-Datei. Kein Server, keine Installation, offline nutzbar.
 
 ---
 
@@ -19,9 +16,7 @@ Ziel: komplexe Geschichten strukturiert, chronologisch und plot-orientiert plane
 ## 1. Navigator (Bände → Kapitel → Szenen)
 
 - Hierarchische Struktur: Bände → Kapitel → Szenen
-- Drag & Drop zur Neuanordnung
-- Statusanzeige (Idee / Entwurf / Revise / Fertig)
-- Wortzählung pro Szene, Kapitel und Band
+- Drag & Drop, Statusanzeige, Wortzählung
 
 ## 2. Szenen-Editor
 
@@ -29,152 +24,118 @@ Felder: Titel, Zusammenfassung, Haupttext, Notizen, Wortziel, Datum, Strang, POV
 
 ## 3. Beats-Planer
 
-Unterstützte Strukturmethoden (17+):
-Save the Cat, Drei-Akt-Struktur, Freytag-Pyramide, Hero's Journey, Seven-Point Structure,
-Kishōtenketsu, Aristotelische Dramaturgie, Snowflake-Methode, Dan Harmon Story Circle,
-Fichtean Curve, In Medias Res, Nonlinear/Episodic, Blank (frei), und weitere.
+**17+ Strukturmethoden:** Save the Cat, Drei-Akt, Freytag-Pyramide, Hero's Journey, Seven-Point, Kishōtenketsu, Aristotelisch, Snowflake, Dan Harmon, Fichtean Curve, In Medias Res, Nonlinear, Romance, Mystery, Thriller, Blank (frei), u.v.m.
 
-Funktionen:
-- **Multi-Board:** Beliebig viele Boards parallel. Tabs zum Wechseln, Doppelklick = umbenennen.
-- **Phasen-% Zielwert:** Jede Phase zeigt ihren Anteil am Buch in %. Klick zum Bearbeiten. Ohne manuellen Wert: automatisch aus Beat-Anzahl errechnet.
-- **Mehrere Szenen pro Beat:** „＋ Szene" verknüpft beliebig viele Szenen. Chips zeigen Status (grün = Fertig, blau = Entwurf). Klick auf Chip öffnet Verwaltung.
-- **Drag & Drop** innerhalb und zwischen Phasen
-- **Methoden ausblenden:** Kopfbereich bleibt sichtbar (Knopf bleibt zugänglich). Einstellung pro Projekt gespeichert.
-- **Vorschau:** Klick auf Methodenkarte zeigt alle Phasen/Beats vorab.
-- JSON Export / Import
+**Funktionen:**
+- **Multi-Board:** Beliebig viele Boards parallel (Tabs)
+- **Phasen-% Zielwert:** Pro Phase — Anteil am Buch in %, klickbar zum Bearbeiten
+- **Beat-% pro Karte:** Jede Beat-Karte zeigt ihre ungefähre Position im Buch als „~X%"-Tag
+- **Mehrere Szenen pro Beat:** „＋ Szene" verknüpft beliebig viele. Chips: grün = Fertig, blau = Entwurf
+- Drag & Drop innerhalb und zwischen Phasen
+- JSON Export / Import (auch im Gesamtexport enthalten)
 
 ## 4. Korkboard
 
-Kartenansicht aller Szenen, Drag & Drop zur Neuanordnung, Strang-Farbmarkierung.
+Kartenansicht aller Szenen. Drag & Drop, Strang-Farbmarkierung.
 
 ## 5. Planer
 
-Kanban-Ansicht (Spalte pro Handlungsstrang). Karten mit Titel, Notiz, Datum, Status, Szenenverknüpfung.  
-Datum-Logik: Manuell = 🔒 (fest), automatisch = ⟳ (interpoliert zwischen festen Karten).
+Kanban-Ansicht (Spalte pro Strang). 🔒 = manuelles Datum, ⟳ = automatisch interpoliert.
 
 ## 6. Story-Chronik (Raster)
 
-**Datum-Ansicht:** Zeilen = Tage, Spalten = Stränge.
-- Szenen und Planer-Blöcke mit Datum erscheinen automatisch in der richtigen Zelle
-- Planer-Blöcke ohne verknüpfte Szene: orange ⊡-Chips
-- Drag & Drop: Szene/Planer-Block in andere Zelle → Datum wird gesetzt und überall synchronisiert
-- 🔒 = manuell gesetztes Datum, ⟳ = errechnetes Datum
-- Tagesnotizen, leere Tage ausblendbar
+**Datum-Ansicht:** Tage × Stränge. Szenen und Planer-Blöcke mit Datum erscheinen automatisch. Drag & Drop setzt/verschiebt Datum. Synchron mit allen anderen Ansichten.
 
-**Kapitel-Ansicht:** Zeilen = Kapitel, Spalten = Stränge.
-- Drag & Drop zwischen Zellen (Kapitel und/oder Strang wechseln)
-- ⊕ Szene verknüpfen, ＋ Neue Szene erstellen — direkt aus dem Raster
+**Kapitel-Ansicht:** Kapitel × Stränge. Drag & Drop zwischen Zellen (Kapitel/Strang wechseln). ⊕ Szene verknüpfen, ＋ Neu erstellen.
 
-Datumskonflikte (Datumsreihenfolge ≠ Kapitelreihenfolge) werden erkannt und als Warnung angezeigt.  
-CSV-Export der kompletten Chronik.
+Datumskonflikte werden erkannt. CSV-Export.
 
 ## 7. Kalender & Timeline
 
-Monatsübersicht und Timeline-Balken. Gleiches Datum-System wie Raster und Planer — alles synchron.
+Monatsübersicht und Timeline-Balken. Synchron mit Raster und Planer.
 
 ## 8. Weltkarte
 
-- Leaflet-basierte interaktive Karte (CartoDB Dark)
-- Orte mit Pins markieren (geocodierbar oder per Klick)
-- **Eigene Weltkarte hochladen:** JPG/PNG als Kartenhintergrund (ideal für Fantasy/Sci-Fi)
-- **🌍 OpenStreetMap ausblenden:** Echte Karte deaktivieren, nur eigene Karte zeigen
-- Karten-Bild und Pins pro Projekt gespeichert
+- Leaflet + CartoDB Dark Hintergrund
+- Orte geocodierbar oder per Klick markieren
+- **🗺 Eigene Weltkarte hochladen:** JPG/PNG als Kartenhintergrund (ideal für Fantasy)
+- **🌍 OSM-Toggle:** OpenStreetMap ein-/ausblenden — erneuter Klick stellt wieder her
+- Pro Projekt gespeichert
 
 ## 9. Mehrere Projekte
 
-**📁 Projekt-Menü** oben links. Jedes Projekt hat vollständig getrennten Stand:  
-Bände/Kapitel/Szenen, Charaktere, Orte, Planer, Stränge, Beats, Story-Chronik, Spotify, Weltkarte.  
-Beim Wechsel: automatisch gespeichert. ＋ Neu, ✎ Umbenennen, ✕ Löschen (Hauptprojekt geschützt).
+**📁 Projekt-Menü** oben links. Vollständig getrennte Daten pro Projekt.
+
+- **🖼 Buchcover:** „Cover"-Button im Menü → JPG/PNG hochladen. Erscheint als Thumbnail im Menü und Header-Logo. Automatisch auf max. 200×300px skaliert.
+- ＋ Neu, ✎ Umbenennen, ✕ Löschen (Hauptprojekt geschützt)
+- Beim Wechsel: automatisch gespeichert
 
 ## 10. Dashboard
 
-- Gesamtstatistiken: Bände, Kapitel, Szenen, Wörter, Wortziel-Fortschritt
-- Status-Verteilung, Strang-Fortschritt
-- **Beat-Fortschritt:** Pro Board und Phase: wie viele Beats haben eine „Fertig"-Szene? Balken + Prozent.
+- Statistiken: Bände, Kapitel, Szenen, Wörter
+- **Beat-Fortschritt:** Pro Board/Phase — Balken und % der abgeschlossenen Beats
 - „Next up" — nächste offene Szenen und Planer-Karten
 
-## 11. Buchansicht
+## 11. Buchansicht / Storyboard / Suche
 
-Alle Szenen als zusammenhängende Lesefassung. Gut für Durchlesen, Beta-Feedback, Exportvorbereitung.
+Buchansicht: alle Szenen als Lesefassung. Storyboard: visuelle Kartenplanung. Suche: Volltext.
 
-## 12. Storyboard
+## 12. Spotify-Widget (rechte Sidebar)
 
-Visuelle Shot-/Szenenplanung mit Karten. Ideal für filmisches Denken.
-
-## 13. Suche
-
-Volltext-Suche über alle Szenen (Titel, Text, Zusammenfassung, Notizen).
-
-## 14. Spotify-Widget (rechte Sidebar)
-
-Mehrere Playlists anpinnen: Link einfügen + ▶ + Name vergeben → als Chip gespeichert.  
-Unterstützt Playlists, Tracks, Alben, Podcasts. Pro Projekt getrennt gespeichert.
+Mehrere Playlists anpinnen (Link + ▶ + Name). Chips zum Wechseln. Pro Projekt getrennt.
 
 ---
 
 # Datenspeicherung
 
-## Wo wird gespeichert?
+## Was steckt alles in der JSON-Sicherung?
 
-| Daten | Speicher | Key |
-|---|---|---|
-| Szenen, Kapitel, Bände, Charaktere, Orte, Planer | IndexedDB `TrilogyWriterV3` | `state` (Hauptprojekt) / `state_<id>` |
-| Beats | localStorage | `skriptorium.beats.v2.<projektId>` |
-| Story-Chronik | localStorage | `skriptorium.chronik.v1.<projektId>` |
-| Spotify | localStorage | `skriptorium.spotify.v2.<projektId>` |
-| Projektliste | localStorage | `skriptorium.projects` |
+Der **„↓ JSON"-Export** im Header enthält **alles** in einer Datei:
 
-Alle Daten bleiben lokal im Browser. Kein Server, keine Cloud.
+| Daten | Enthalten? |
+|---|---|
+| Bände, Kapitel, Szenen | ✅ |
+| Charaktere, Orte | ✅ |
+| Planer-Karten + Reihenfolge | ✅ |
+| Handlungsstränge | ✅ |
+| Beats (alle Boards, Phasen, Verknüpfungen) | ✅ als `_beats` |
+| Story-Chronik (Raster-Notizen, Zellen) | ✅ als `_grid` |
+| Spotify-Playlists | ✅ als `_spotify` |
+| Weltkarte (eigenes Bild, Pins) | ✅ |
+| Buchcover | ✅ (im Projekt-Eintrag) |
+
+> **Hinweis:** Beats und Raster werden technisch in localStorage gespeichert (schneller), aber beim Export automatisch gebündelt. Ein einziger Export reicht für eine vollständige Sicherung.
+
+## Warum sind Beats/Raster/Spotify technisch getrennt?
+
+Diese Module speichern in localStorage für schnelle, synchrone Zugriffe ohne IndexedDB-Roundtrip. Funktional ist alles beim Export vereint — für den Nutzer gibt es nur eine Sicherungsdatei.
 
 ## Speicherverbrauch
 
-- **Typisches Romanprojekt** (80.000 Wörter, 100 Szenen): ca. 2–8 MB
-- **IndexedDB-Limit:** Üblicherweise 50 MB – 1 GB+ (kein praktisches Problem)
-- **localStorage-Limit:** ca. 5–10 MB (bei sehr vielen Projekten kann es eng werden)
-
-## Bilder (Storyboard / Weltkarte)
-
-Bilder werden als **Base64** im State gespeichert — das kann den Speicher schnell füllen!
-
-Empfehlung:
-- Eigene Weltkarten als komprimiertes JPG unter 1 MB hochladen
-- Storyboard-Bilder klein halten
-- Regelmäßig per „↓ JSON" exportieren als Backup
+- **Typisches Romanprojekt** (80.000 Wörter): ~2–8 MB
+- **IndexedDB:** Meist GB-Kapazität, kein praktisches Problem
+- **localStorage-Limit:** ~5–10 MB
+- **Bilder (Weltkarte, Cover, Storyboard):** Als Base64 → komprimierte JPGs verwenden!
 
 ## Backup-Empfehlung
 
-`↓ JSON` im Header sichert alle Daten des aktiven Projekts. Mit `↑ JSON` jederzeit wiederherstellbar.
+`↓ JSON` im Header regelmäßig ausführen — sichert wirklich alles.
 
 ---
 
 # Technische Basis
 
-- **HTML / CSS / Vanilla JavaScript** — keine Abhängigkeiten, keine Build-Pipeline
-- **IndexedDB** für Hauptstate (pro Projekt eigener Schlüssel)
-- **localStorage** für Module (Beats, Grid, Spotify) mit Projekt-Scoping
-- **Leaflet.js** für Weltkarte (CDN, Internetverbindung bei erstem Laden nötig)
-- **Single-File-App:** Alles in einer `.html`-Datei, danach offline nutzbar
-
----
-
-# Design-Ziele
-
-- Chronologische Klarheit — Datum-Logik zieht sich durch alle Ansichten
-- Mehrstrang-Übersicht — alle Stränge gleichzeitig sichtbar
-- Strukturunabhängigkeit — keine Zwangsdramaturgie
-- Bidirektionale Synchronisation — Änderungen propagieren in alle anderen Ansichten
-- Persistente Speicherung ohne Cloud
-- Single-File — portabel, keine Installation
+- **HTML / CSS / Vanilla JavaScript** — Single-File, keine Dependencies
+- **IndexedDB** (`TrilogyWriterV3`) — Hauptstate, project-scoped (`state` / `state_<id>`)
+- **localStorage** — Beats, Grid, Spotify (Keys: `skriptorium.*.v2.<projektId>`)
+- **Leaflet.js** — Weltkarte (CDN, einmalig Internet nötig)
 
 ---
 
 # Vision
 
-Skriptorium soll ein **Story-Architektur-System** sein —  
-für Autor:innen, die komplexe Plots planen, mehrere Stränge koordinieren,  
-Dramaturgie bewusst einsetzen und Chronologie exakt kontrollieren.  
-Alles in einer Datei. Ohne Abo.
+Skriptorium ist ein **Story-Architektur-System** — für Autor:innen, die komplexe Plots planen, mehrere Stränge koordinieren, Dramaturgie bewusst einsetzen und Chronologie exakt kontrollieren. Alles in einer Datei. Ohne Abo.
 
 ---
 
-*Ende der Dokumentation — Version 2.0*
+*Ende der Dokumentation — Version 2.1*

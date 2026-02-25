@@ -616,6 +616,8 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .beats-col-btn{font-family:var(--mono);font-size:10px;color:var(--text3);background:none;border:1px solid var(--border2);
   padding:2px 7px;border-radius:10px;cursor:pointer;transition:all .12s}
 .beats-col-btn:hover{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
+.beats-col-pct{font-family:var(--mono);font-size:9px;color:var(--accent2);cursor:pointer;padding:1px 5px;border:1px solid transparent;border-radius:3px;transition:all .1s;white-space:nowrap}
+.beats-col-pct:hover{border-color:var(--accent2);background:var(--accent-glow)}
 .beats-cards{flex:1;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:8px}
 .beat-card{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent2);
   border-radius:12px;padding:10px 10px 9px;cursor:pointer;user-select:none;transition:all .12s}
@@ -624,6 +626,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .beat-title{font-family:var(--font);font-size:12px;font-style:italic;color:var(--text);margin-bottom:6px;line-height:1.25}
 .beat-note{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .beat-meta{display:flex;gap:8px;margin-top:8px;align-items:center}
+.beat-pct-chip{color:var(--accent2)!important;border-color:rgba(99,179,237,.3)!important;font-size:8px!important;opacity:.8}
 .beat-chip{font-family:var(--mono);font-size:9px;color:var(--text3);border:1px solid var(--border);padding:2px 7px;border-radius:999px}
 .beat-chip.link{color:var(--sd);border-color:rgba(45,106,159,.5)}
 .beats-drop-over{outline:2px dashed var(--accent2);outline-offset:-6px;background:rgba(200,169,110,.06)}
@@ -724,7 +727,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 
 
 .beats-methods{border-bottom:1px solid var(--border);background:var(--bg1);padding:12px 16px}
-.beats-methods.hidden{display:none}
+.beats-methods.hidden .beats-methods-grid,.beats-methods.hidden .beats-methods-foot{display:none}
 .beats-methods-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
 .beats-methods-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
 .beats-methods-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
@@ -931,7 +934,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 #proj-menu{position:fixed;z-index:3200;background:var(--bg3);border:1px solid var(--border2);
   min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none}
 #proj-menu.open{display:block}
-.proj-item{display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer;
+.proj-item{display:flex;align-items:center;gap:7px;gap:6px;padding:8px 12px;cursor:pointer;
   border-bottom:1px solid var(--border);transition:background .1s}
 .proj-item:last-child{border-bottom:none}
 .proj-item:hover{background:var(--bg4)}
@@ -950,7 +953,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 #spotify-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--text3);flex:1}
 #spotify-chevron{font-size:9px;color:var(--text3);transition:transform .15s}
-#spotify-body{padding:8px 10px 10px}
+#spotify-body{padding:8px 10px 10px;overflow-y:auto;max-height:340px}
 #spotify-input-row{display:flex;gap:5px;margin-bottom:8px}
 #spotify-url-inp{flex:1;font-family:var(--mono);font-size:10px;background:var(--bg3);
   border:1px solid var(--border2);color:var(--text);padding:4px 7px;outline:none;min-width:0}
@@ -1070,6 +1073,8 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .gp-scene-auto .gp-scene-chip{border-style:dashed}
 .gp-scene-lock{font-size:9px;flex-shrink:0;width:13px;text-align:center;color:var(--text3)}
 .gp-drop-over{background:var(--accent-glow)!important;outline:2px dashed var(--accent2);outline-offset:-2px}
+.gp-scene-card{border-left:2px solid var(--sr)!important}
+.gp-card-chip{color:var(--sr)!important;border-color:rgba(246,173,85,.3)!important}
 
 </style>
 </head>
@@ -1078,6 +1083,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 <!-- HEADER -->
 <div id="hdr">
   <div id="app-logo">✦ Skriptorium</div>
+  <button class="hbtn" style="color:#f6ad55;border-color:#f6ad55;font-weight:bold" onclick="App.showRecovery()" title="Daten wiederherstellen">⚠ Daten-Wiederherstellung</button>
   <div id="proj-switcher">
     <button id="proj-btn" onclick="ProjectMgr.toggleMenu(event)" title="Projekt wechseln">📁 Projekt</button>
     <div id="proj-menu"></div>
@@ -1510,6 +1516,11 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
             <button class="zoom-btn" onclick="MapView.geocode(document.getElementById('map-geocode-inp').value)">Suchen</button>
           </div>
           <button class="zoom-btn" onclick="MapView.resetView()">⌂</button>
+          <label class="zoom-btn" title="Eigene Weltkarte hochladen (JPG/PNG)" style="cursor:pointer">
+            🗺 Karte laden
+            <input type="file" accept="image/*" style="display:none" onchange="MapView.loadCustomMap(event)">
+          </label>
+          <button class="zoom-btn" id="map-real-toggle" onclick="MapView.toggleRealMap()" title="OpenStreetMap-Hintergrund ein/ausblenden">🌍</button>
         </div>
         <div id="world-map" style="flex:1"></div>
       </div>
@@ -1783,6 +1794,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
           <ul>
             <li>Beats per Drag &amp; Drop innerhalb oder zwischen Phasen verschieben.</li>
             <li>Klick auf „<b>＋ Szene</b>" am Beat öffnet einen Picker – mehrere Szenen pro Beat möglich.</li>
+            <li>Jede Phase zeigt ihren <b>Ziel-Anteil am Buch</b> in Prozent (z. B. „~25%"). Klick auf den Prozentwert zum Bearbeiten. Ohne manuellen Wert wird der Anteil automatisch aus der Beat-Anzahl errechnet.</li>
             <li>Bereits verknüpfte Szenen erscheinen als farbige Chips (grün = Fertig, blau = Entwurf).</li>
             <li>Klick auf einen Chip öffnet die Verwaltung – dort können Szenen auch wieder getrennt werden.</li>
             <li>„✎ Bearbeiten" öffnet den vollständigen Beat-Editor.</li>
@@ -1846,24 +1858,32 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
           <h2 id="h-karte">Weltkarte</h2>
           <p>Die Weltkarte hilft, Orte geografisch zu verorten. Besonders nützlich für:</p>
           <ul>
-            <li>Reiserouten</li>
-            <li>Fantasy-/Sci-Fi-Welten</li>
+            <li>Reiserouten in Fantasywelten oder auf realen Karten</li>
+            <li>Fantasy-/Sci-Fi-Welten mit eigener Geografie</li>
             <li>Mehrere Schauplätze in Serie</li>
+          </ul>
+          <p><b>🗺 Eigene Weltkarte hochladen:</b> Mit dem Button „Karte laden" in der Toolbar kann eine eigene JPG- oder PNG-Datei als Kartenhintergrund geladen werden. Die Karte wird über die gesamte Weltkarte gelegt. Pins für Orte können weiterhin gesetzt werden.</p>
+          <ul>
+            <li><b>🌍 OSM ein/ausblenden:</b> Der 🌍-Button blendet den OpenStreetMap-Hintergrund ein und aus. Erneuter Klick stellt ihn wieder her – ideal für eigene Fantasykarten.</li>
+            <li>Eigene Karten werden pro Projekt gespeichert.</li>
+            <li>Für Fantasykarten: Zunächst die Openstreetmap-Karte ausblenden (🌍), dann die eigene laden.</li>
           </ul>
 
           <h2 id="h-dashboard">Dashboard</h2>
           <p>Im Dashboard findest du Statistiken und Übersicht:</p>
           <ul>
-            <li>Wortzahlen</li>
-            <li>Status-Verteilung</li>
-            <li>„Next up“ / Nächste Szenen</li>
+            <li>Wortzahlen und Wortziel-Fortschritt</li>
+            <li>Status-Verteilung (Idee / Entwurf / Revise / Fertig)</li>
+            <li>„Next up“ – nächste offene Szenen/Planer-Karten</li>
+            <li><b>Beat-Fortschritt:</b> Pro Beat-Board zeigt das Dashboard, wie viele Beats eine verknüpfte „Fertig“-Szene haben – nach Phase aufgeschlüsselt mit Balken und Prozentzahl.</li>
           </ul>
 
           <h2 id="h-importexport">Import / Export</h2>
           <p>Oben im Header findest du die wichtigsten Dateien:</p>
           <ul>
-            <li><b>↑ Import</b>: Markdown, Projekt-JSON, Charaktere, Orte.</li>
-            <li><b>↓ Export</b>: Projekt-JSON, Charaktere-JSON, Orte-JSON, HTML/Word, Markdown.</li>
+            <li><b>↑ Import</b>: Markdown, Projekt-JSON (enthält Beats, Raster und Spotify), Charaktere, Orte.</li>
+            <li><b>↓ Export</b>: Projekt-JSON (enthält <em>alle</em> Daten inkl. Beats, Raster-Notizen und Spotify-Playlists), Charaktere-JSON, Orte-JSON, HTML/Word, Markdown.</li>
+            <li><b>Vollständige Sicherung:</b> Der „↓ JSON"-Export im Header speichert alles in einer Datei – Beats, Chronik, Spotify und alle Szenen.</li>
           </ul>
           <div class="help-warn">
             <p><b>Reset</b> setzt alles zurück. Exportiere vorher dein Projekt-JSON als Backup.</p>
@@ -1971,9 +1991,41 @@ function defaultState() {
 let state = defaultState();
 let _saveT = null;
 
+// Project-scoped DB key: default project uses legacy 'state' key for backwards compat
+function _stateKey() {
+  try {
+    const id = localStorage.getItem('skriptorium.activeProject') || 'default';
+    return id === 'default' ? 'state' : 'state_' + id;
+  } catch(_) { return 'state'; }
+}
+
 async function loadState() {
   try {
-    const s = await DB.get('state');
+    const key = _stateKey();
+    let s = await DB.get(key);
+
+    // ALWAYS fall back to legacy 'state' key if nothing found — protects against
+    // stale localStorage activeProject values from previous sessions
+    if (!s) s = await DB.get('state');
+
+    // Also try scanning all known project state keys as last resort
+    if (!s) {
+      try {
+        const ps = JSON.parse(localStorage.getItem('skriptorium.projects')||'[]');
+        for (const p of ps) {
+          const k = p.id === 'default' ? 'state' : 'state_' + p.id;
+          const candidate = await DB.get(k);
+          if (candidate && candidate.volumes && candidate.volumes.length) {
+            s = candidate;
+            // Reset active project to match what we found
+            try { localStorage.setItem('skriptorium.activeProject', p.id); } catch(_){}
+            console.warn('Skriptorium: data recovered from project', p.id);
+            break;
+          }
+        }
+      } catch(_){}
+    }
+
     if (s) {
       state = Object.assign(defaultState(), s);
       state.ui = Object.assign(defaultState().ui, s.ui || {});
@@ -1985,16 +2037,16 @@ async function loadState() {
       if (!state.ui.plannerView) state.ui.plannerView = 'columns';
       if (!state.storyboard) state.storyboard = {};
     }
-  } catch(e) { console.warn(e); }
+  } catch(e) { console.warn('loadState error:', e); }
 }
 
 function saveState() {
   if (_saveT) clearTimeout(_saveT);
-  _saveT = setTimeout(() => DB.set('state', state).catch(e => toast('Speicherfehler: '+e.message,'err')), 300);
+  _saveT = setTimeout(() => DB.set(_stateKey(), state).catch(e => toast('Speicherfehler: '+e.message,'err')), 300);
 }
 function saveStateNow() {
   if (_saveT) { clearTimeout(_saveT); _saveT = null; }
-  return DB.set('state', state).catch(e => toast('Speicherfehler: '+e.message,'err'));
+  return DB.set(_stateKey(), state).catch(e => toast('Speicherfehler: '+e.message,'err'));
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -4662,8 +4714,13 @@ const App = {
 
   async exportProject() {
     await saveStateNow();
-    download('trilogy-writer-export.json', JSON.stringify(state,null,2));
-    toast('Export erfolgreich','ok');
+    // Bundle beats, grid and spotify into export snapshot
+    const snapshot = JSON.parse(JSON.stringify(state));
+    try { snapshot._beats = JSON.parse(localStorage.getItem(lsKeyBeats())||'null'); } catch(_){}
+    try { snapshot._grid = JSON.parse(localStorage.getItem(lsKeyGrid())||'null'); } catch(_){}
+    try { snapshot._spotify = JSON.parse(localStorage.getItem(lsKeySpotify())||'null'); } catch(_){}
+    download('skriptorium-export.json', JSON.stringify(snapshot,null,2));
+    toast('Export erfolgreich (inkl. Beats, Raster, Spotify)','ok');
   },
   exportHTML() {
     const html = buildHTMLExport();
@@ -4686,8 +4743,18 @@ const App = {
           const p=JSON.parse(text);
           state=Object.assign(defaultState(),p);
           state.ui=Object.assign(defaultState().ui,p.ui||{});
-          await saveStateNow(); expandAll(); render();
-          toast('Projekt importiert','ok');
+          // Restore beats if bundled
+          if (p._beats) { try { localStorage.setItem(lsKeyBeats(), JSON.stringify(p._beats)); } catch(_){} }
+          // Restore grid if bundled
+          if (p._grid) { try { localStorage.setItem(lsKeyGrid(), JSON.stringify(p._grid)); } catch(_){} }
+          // Restore spotify if bundled
+          if (p._spotify) { try { localStorage.setItem(lsKeySpotify(), JSON.stringify(p._spotify)); } catch(_){} }
+          await saveStateNow();
+          try { Beats.init(); } catch(_){}
+          try { GridPlan.init(); } catch(_){}
+          try { SpotifyWidget.init(); } catch(_){}
+          expandAll(); render();
+          toast('Projekt importiert (inkl. Beats, Raster, Spotify)','ok');
         } catch(e){toast('JSON-Fehler: '+e.message,'err');}
       });
     };
@@ -4869,6 +4936,72 @@ const App = {
     if (!confirm('Alle Daten löschen?')) return;
     state=defaultState(); await DB.clear(); render();
     toast('App zurückgesetzt');
+  },
+
+  async showRecovery() {
+    let html = '<div class="modal-title" style="color:#f6ad55">⚠ Daten-Wiederherstellung</div>';
+    html += '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:12px">Skriptorium scannt alle gespeicherten Daten im Browser:</div>';
+    try {
+      const allKeys = await new Promise((res) => {
+        const r = indexedDB.open('TrilogyWriterV3', 1);
+        r.onsuccess = e => {
+          const db = e.target.result;
+          const tx = db.transaction('data','readonly');
+          const req = tx.objectStore('data').getAllKeys();
+          req.onsuccess = () => res(req.result||[]);
+          req.onerror = () => res([]);
+        };
+        r.onerror = () => res([]);
+      });
+      html += '<div style="font-family:var(--mono);font-size:9px;color:var(--text2);margin-bottom:8px">Gefundene DB-Schlüssel: <b>' + (allKeys.length||0) + '</b> &nbsp;[' + allKeys.join(', ') + ']</div>';
+      let foundAny = false;
+      for (const key of allKeys) {
+        try {
+          const val = await DB.get(key);
+          if (val && typeof val === 'object') {
+            const vols = val.volumes||[];
+            const scCount = vols.reduce((a,v)=>(v.chapters||[]).reduce((b,c)=>b+(c.scenes||[]).length,a),0);
+            const wCount = vols.reduce((a,v)=>(v.chapters||[]).reduce((b,c)=>(c.scenes||[]).reduce((d,s)=>d+(s.text||'').trim().split(/\s+/).filter(Boolean).length,b),a),0);
+            foundAny = true;
+            html += '<div style="background:var(--bg2);border:1px solid #f6ad55;border-radius:8px;padding:10px 12px;margin-bottom:8px">';
+            html += '<div style="font-family:var(--mono);font-size:10px;color:var(--accent)">Schlüssel: <b>' + key + '</b></div>';
+            html += '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin:4px 0">' + vols.length + ' Bände · ' + scCount + ' Szenen · ~' + wCount.toLocaleString('de') + ' Wörter</div>';
+            const safeKey = key.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+            html += '<button class="mbtn primary" style="margin-top:6px;font-size:11px" onclick="App._recoverFrom(\'' + safeKey + '\');closeModal()">✓ Diese Daten laden</button>';
+            html += '</div>';
+          }
+        } catch(_){}
+      }
+      if (!foundAny) {
+        html += '<div style="font-family:var(--font);font-size:12px;color:#fc8181;padding:8px 0">Keine Projektdaten gefunden in IndexedDB.<br>Möglicherweise wurden die Daten in einem anderen Browser oder Gerät gespeichert.</div>';
+      }
+      const lsKeys = [];
+      try { for (let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('skriptorium'))lsKeys.push(k);} } catch(_){}
+      html += '<div style="font-family:var(--mono);font-size:8px;color:var(--text3);margin-top:10px;word-break:break-all">localStorage: ' + (lsKeys.join(', ')||'(leer)') + '</div>';
+    } catch(e) {
+      html += '<div style="color:#fc8181;font-family:var(--mono);font-size:11px">Scan-Fehler: ' + e.message + '</div>';
+    }
+    html += '<div class="modal-btns" style="margin-top:12px"><button class="mbtn" onclick="closeModal()">Schließen</button></div>';
+    showModal(html);
+  },
+
+  async _recoverFrom(key) {
+    try {
+      const s = await DB.get(key);
+      if (!s) { toast('Keine Daten unter diesem Schlüssel.','err'); return; }
+      state = Object.assign(defaultState(), s);
+      state.ui = Object.assign(defaultState().ui, s.ui||{});
+      if (!Array.isArray(state.locations)) state.locations = [];
+      if (!Array.isArray(state.strands)||!state.strands.length) state.strands = defaultStrands();
+      if (!state.planner) state.planner = {cards:[],order:{}};
+      if (!state.planner.cards) state.planner.cards = [];
+      if (!state.planner.order) state.planner.order = {};
+      if (!state.storyboard) state.storyboard = {};
+      try { localStorage.setItem('skriptorium.activeProject','default'); } catch(_){}
+      await saveStateNow();
+      expandAll(); render();
+      toast('Daten geladen: ' + (state.volumes||[]).length + ' Bände', 'ok');
+    } catch(e) { toast('Fehler: ' + e.message, 'err'); }
   }
 };
 
@@ -6005,7 +6138,7 @@ const MapView = (() => {
     if (typeof L === 'undefined') { document.getElementById('world-map').innerHTML='<div style="padding:40px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text3)">Leaflet konnte nicht geladen werden. Internet erforderlich.</div>'; return; }
     initialized = true;
     map = L.map('world-map', { zoomControl: true, attributionControl: false }).setView([20, 10], 2);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    _tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       subdomains: 'abcd', maxZoom: 19
     }).addTo(map);
     L.control.attribution({prefix:'© OpenStreetMap, CartoDB'}).addTo(map);
@@ -6018,6 +6151,7 @@ const MapView = (() => {
       }
     });
     refresh();
+    setTimeout(_loadSavedCustomMap, 100);
   }
 
   function setLocPin(locName, lat, lng) {
@@ -6192,7 +6326,69 @@ const MapView = (() => {
     document.getElementById('map-toolbar').style.background = '';
   }
 
-  return { init, refresh, nextScene, prevScene, resetView, startPlacingExt, geocode, _confirmPin, _cancelPlace };
+  let _customImageOverlay = null;
+  let _tileLayerHidden = false;
+  let _tileLayer = null;
+
+  function loadCustomMap(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!map) { toast('Karte noch nicht initialisiert.', 'err'); return; }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      // Remove existing custom overlay
+      if (_customImageOverlay) { try { map.removeLayer(_customImageOverlay); } catch(_){} _customImageOverlay = null; }
+
+      const img = new Image();
+      img.onload = () => {
+        // Use full world bounds initially, user can pan/zoom
+        const bounds = [[-85, -180], [85, 180]];
+        _customImageOverlay = L.imageOverlay(e.target.result, bounds, {
+          opacity: 0.95, interactive: false, zIndex: 10
+        }).addTo(map);
+        map.fitBounds(bounds);
+
+        // Save to state for persistence
+        try { state.customMapImage = { src: e.target.result }; saveState(); } catch(_){}
+        toast('Weltkarte geladen. Pins können weiterhin gesetzt werden.', 'ok');
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function _loadSavedCustomMap() {
+    try {
+      if (state.customMapImage && state.customMapImage.src && map) {
+        const bounds = [[-85, -180], [85, 180]];
+        _customImageOverlay = L.imageOverlay(state.customMapImage.src, bounds, { opacity: 0.95, zIndex: 10 }).addTo(map);
+      }
+    } catch(_){}
+  }
+
+  function removeCustomMap() {
+    if (_customImageOverlay) { try { map.removeLayer(_customImageOverlay); } catch(_){} _customImageOverlay = null; }
+    try { delete state.customMapImage; saveState(); } catch(_){}
+    toast('Eigene Karte entfernt.', 'ok');
+  }
+
+  function toggleRealMap() {
+    if (!map || !_tileLayer) return;
+    _tileLayerHidden = !_tileLayerHidden;
+    if (_tileLayerHidden) {
+      map.removeLayer(_tileLayer);
+    } else {
+      _tileLayer.addTo(map);
+      // Make sure it's below the custom image overlay
+      _tileLayer.setZIndex(0);
+      if (_customImageOverlay) _customImageOverlay.setZIndex(10);
+    }
+    const btn = document.getElementById('map-real-toggle');
+    if (btn) { btn.style.opacity = _tileLayerHidden ? '0.4' : '1'; btn.title = _tileLayerHidden ? 'OSM einblenden' : 'OSM ausblenden'; }
+  }
+
+  return { init, refresh, nextScene, prevScene, resetView, startPlacingExt, geocode, _confirmPin, _cancelPlace, loadCustomMap, removeCustomMap, toggleRealMap, _loadSavedCustomMap };
 })();
 
 // ════════════════════════════════════════════════════════════════
@@ -6495,13 +6691,19 @@ async function init(){
 
 /* ── HELP (User Manual) ─────────────────────────────────────────── */
 
-/* ── BEATS PLANNER (Mel Torrefranca-inspired, customizable) ───────────────── */
+/* ── PROJECT KEY HELPER ────────────────────────────────────────── */
 
-/* ── BEATS (multi-board) ──────────────────────────────────────── */
+function _activeProjectId() {
+  try { return localStorage.getItem('skriptorium.activeProject')||'default'; } catch(_){ return 'default'; }
+}
+// Helpers for module localStorage keys (used by export/import)
+function lsKeyBeats()   { return 'skriptorium.beats.v2.'   + _activeProjectId(); }
+function lsKeyGrid()    { return 'skriptorium.chronik.v1.' + _activeProjectId(); }
+function lsKeySpotify() { return 'skriptorium.spotify.v2.' + _activeProjectId(); }
 
 /* ── BEATS (multi-board) ──────────────────────────────────────── */
 const Beats = (() => {
-  const LS_KEY = 'skriptorium.beats.v2';
+  const lsKey = () => 'skriptorium.beats.v2.' + _activeProjectId();
   const el = id => document.getElementById(id);
   const uid = () => Math.random().toString(36).slice(2, 10);
 
@@ -6581,12 +6783,12 @@ const Beats = (() => {
 
   /* ── SAVE / LOAD ─────────────────────────────────────────────── */
   function save() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(bState)); } catch(_) {}
+    try { localStorage.setItem(lsKey(), JSON.stringify(bState)); } catch(_) {}
   }
   function load() {
     // 1. Try new multi-board key
     try {
-      const raw = localStorage.getItem(LS_KEY);
+      const raw = localStorage.getItem(lsKey());
       if (raw) {
         const p = JSON.parse(raw);
         if (p && p.boards) { bState = p; return; }
@@ -6672,6 +6874,17 @@ const Beats = (() => {
     if (!name) return;
     p.name = name; save(); render();
   }
+  function editPhasePct(phaseId, current) {
+    const m = getModel();
+    const p = m.phases.find(x => x.id === phaseId); if (!p) return;
+    const val = prompt('Ziel-Anteil dieser Phase am Buch (0–100 %):\n(Leer lassen = auto aus Beat-Anzahl berechnen)', current != null ? String(current) : '');
+    if (val === null) return;
+    const n = parseInt(val);
+    if (val.trim() === '') { delete p.targetPct; }
+    else if (!isNaN(n) && n >= 0 && n <= 100) { p.targetPct = n; }
+    else { toast('Ungültiger Wert (0–100 oder leer).', 'err'); return; }
+    save(); render();
+  }
   function deletePhase(phaseId) {
     const m = getModel();
     if (m.phases.length <= 1) { toast('Mindestens eine Phase muss bleiben.','err'); return; }
@@ -6710,13 +6923,26 @@ const Beats = (() => {
 
       const head = document.createElement('div'); head.className = 'beats-col-head';
       const title = document.createElement('div'); title.className = 'beats-col-title'; title.textContent = phase.name;
+
+      // Target percentage indicator
+      const m = getModel();
+      const phaseBeatCount = m.beats.filter(b=>b.phaseId===phase.id).length;
+      const totalBeatCount = m.beats.length || 1;
+      const autoPct = Math.round(phaseBeatCount / totalBeatCount * 100);
+      const targetPct = phase.targetPct != null ? phase.targetPct : autoPct;
+      const pctEl = document.createElement('span');
+      pctEl.className = 'beats-col-pct';
+      pctEl.textContent = '~' + targetPct + '%';
+      pctEl.title = 'Ziel-Anteil am Buch (Klick zum Bearbeiten)';
+      pctEl.addEventListener('click', e => { e.stopPropagation(); editPhasePct(phase.id, targetPct); });
+
       const actions = document.createElement('div'); actions.className = 'beats-col-actions';
 
       const addBtn = document.createElement('button'); addBtn.className='beats-col-btn'; addBtn.textContent='+ Beat'; addBtn.onclick=()=>addBeat(phase.id);
       const renBtn = document.createElement('button'); renBtn.className='beats-col-btn'; renBtn.textContent='✎'; renBtn.title='Phase umbenennen'; renBtn.onclick=()=>renamePhase(phase.id);
       const delBtn = document.createElement('button'); delBtn.className='beats-col-btn'; delBtn.textContent='⌫'; delBtn.title='Phase löschen'; delBtn.onclick=()=>deletePhase(phase.id);
       actions.appendChild(addBtn); actions.appendChild(renBtn); actions.appendChild(delBtn);
-      head.appendChild(title); head.appendChild(actions);
+      head.appendChild(title); head.appendChild(pctEl); head.appendChild(actions);
 
       const cards = document.createElement('div');
       cards.className = 'beats-cards'; cards.dataset.phase = phase.id;
@@ -6746,8 +6972,33 @@ const Beats = (() => {
     const n = document.createElement('div'); n.className='beat-note'; n.textContent=(b.note||'').trim()||'—';
     const meta = document.createElement('div'); meta.className='beat-meta';
 
+    // Beat % chip: shows this beat's approximate position in the book
+    const m2 = getModel();
+    const totalBeats = m2.beats.length || 1;
+    const phaseBeats = m2.beats.filter(x=>x.phaseId===b.phaseId).sort((a,bb)=>a.order-bb.order);
+    const phase = m2.phases.find(p=>p.id===b.phaseId);
+    const phaseTargetPct = phase && phase.targetPct != null ? phase.targetPct : Math.round(phaseBeats.length/totalBeats*100);
+    // Cumulative % at start of this phase
+    const phaseIdx = m2.phases.findIndex(p=>p.id===b.phaseId);
+    let cumPct = 0;
+    for (let i=0;i<phaseIdx;i++) {
+      const ph = m2.phases[i];
+      const phB = m2.beats.filter(x=>x.phaseId===ph.id).length;
+      const phPct = ph.targetPct != null ? ph.targetPct : Math.round(phB/totalBeats*100);
+      cumPct += phPct;
+    }
+    const beatIdxInPhase = phaseBeats.findIndex(x=>x.id===b.id);
+    const beatPct = Math.round(cumPct + (phaseTargetPct * (beatIdxInPhase + 0.5) / (phaseBeats.length || 1)));
+    const beatPctClamped = Math.max(1, Math.min(99, beatPct));
+
     const chip = document.createElement('span'); chip.className='beat-chip'; chip.textContent='Beat';
     meta.appendChild(chip);
+
+    const pctChip = document.createElement('span');
+    pctChip.className = 'beat-chip beat-pct-chip';
+    pctChip.textContent = '~' + beatPctClamped + '%';
+    pctChip.title = 'Ungefähre Position im Buch';
+    meta.appendChild(pctChip);
 
     // Multi-scene chips (sceneIds array + legacy sceneId)
     const allSceneIds = _beatSceneIds(b);
@@ -6953,7 +7204,7 @@ const Beats = (() => {
     window._beatsMethodLibrary = METHOD_LIBRARY;
   }
 
-  function _methodsHiddenKey() { return 'skr.beats.methodsHidden'; }
+  function _methodsHiddenKey() { return 'skr.beats.methodsHidden.' + (typeof _activeProjectId==='function'?_activeProjectId():'default'); }
   function toggleMethods() {
     const box = document.querySelector('.beats-methods'); if (!box) return;
     box.classList.toggle('hidden');
@@ -7047,7 +7298,7 @@ window.BeatsPreview = BeatsPreview;
  *   - Nur gesperrte Daten bleiben beim Umstrukturieren erhalten
  */
 const GridPlan = (() => {
-  const LS = 'skriptorium.chronik.v1';
+  const lsKey = () => 'skriptorium.chronik.v1.' + _activeProjectId();
   let g = null;
   let _link = null;
   let _dragScene = null; // { scId, fromDate }
@@ -7098,9 +7349,11 @@ const GridPlan = (() => {
 
   /* ── SCENE INDEX: date → [{sc, locked}] per strand ───────────── */
   function buildSceneIndex(dates, strands) {
-    // Returns { [date+'::'+strandId]: [{sc, locked, ch, vol}] }
+    // Returns { [date+'::'+strandId]: [{sc, locked, ch, vol, isCard?, card?}] }
     const idx = {};
     const initKey = (d,s) => { const k=ck(d,s); if(!idx[k]) idx[k]=[]; return k; };
+
+    // 1. Scenes with effective dates
     const all = appAllScenes();
     all.forEach(({sc,ch,vol}) => {
       const date = effDate(sc);
@@ -7112,6 +7365,29 @@ const GridPlan = (() => {
         idx[ck(date, sid)].push({ sc, ch, vol, locked: !!sc.timelineStart });
       }
     });
+
+    // 2. Planner cards without a linked scene (placeholder blocks)
+    try {
+      const cards = (state.planner && state.planner.cards) ? state.planner.cards : [];
+      cards.forEach(card => {
+        if (!card.date || card.sceneId) return; // skip no-date or already-linked
+        const sid = card.strandId;
+        if (!sid || sid === 'none') return;
+        const date = card.date;
+        if (!dates.includes(date)) return;
+        initKey(date, sid);
+        // Create a virtual scene-like object for display
+        idx[ck(date, sid)].push({
+          sc: { id: card.id, title: card.title||'Planer-Block', plotStrand: sid,
+                timelineStart: card.dateManual ? date : null,
+                status: card.status||'idea', _isCard: true },
+          ch: null, vol: null,
+          locked: !!card.dateManual,
+          isCard: true, card
+        });
+      });
+    } catch(_){}
+
     return idx;
   }
 
@@ -7147,8 +7423,8 @@ const GridPlan = (() => {
   }
 
   /* ── SCENE DRAG/DROP IN GRID ──────────────────────────────────── */
-  function _scDragStart(e, scId, fromDate) {
-    _dragScene = { scId, fromDate };
+  function _scDragStart(e, scId, fromDate, isCard) {
+    _dragScene = { scId, fromDate, isCard: !!isCard };
     e.dataTransfer.effectAllowed='move';
     e.dataTransfer.setData('text/plain', scId);
     const el = e.target; el.style.opacity='0.4';
@@ -7165,9 +7441,22 @@ const GridPlan = (() => {
     e.preventDefault();
     document.querySelectorAll('.gp-td-cell').forEach(td=>td.classList.remove('gp-drop-over'));
     if (!_dragScene) return;
-    const { scId, fromDate } = _dragScene;
+    const { scId, fromDate, isCard } = _dragScene;
     _dragScene = null;
     if (fromDate === toDate) return;
+
+    if (isCard) {
+      // Planner card drag – update card date and strandId
+      const cards = (state.planner && state.planner.cards) ? state.planner.cards : [];
+      const card = cards.find(c=>c.id===scId);
+      if (!card) return;
+      card.date = toDate; card.dateManual = true;
+      if (strandId && strandId !== 'none') card.strandId = strandId;
+      try { saveState(); } catch(_){}
+      render();
+      _toast('Planer-Block verschoben: '+card.title+' → '+toDate, 'ok');
+      return;
+    }
 
     const all = appAllScenes();
     const found = all.find(({sc})=>sc.id===scId);
@@ -7346,18 +7635,29 @@ const GridPlan = (() => {
         // Note textarea
         html+='<textarea class="gp-cell-note" rows="2" placeholder="'+EQ(s.label||s.name||'...')+'" data-date="'+date+'" data-strand="'+E(s.id)+'" onblur="GridPlan.onCellNoteBlur(this)">'+E(cell.note||'')+'</textarea>';
 
-        // Scenes from index (auto or locked)
+        // Scenes + planner cards from index
         if(cellScenes.length){
           html+='<div class="gp-scene-list">';
-          cellScenes.forEach(({sc,locked})=>{
-            const lockIcon=locked?'🔒':'⟳';
-            const lockTitle=locked?'Manuelles Datum – im Editor bearbeiten':'Errechnetes Datum – Verschieben sperrt es';
-            html+='<div class="gp-scene-row'+(locked?'':' gp-scene-auto')+'" draggable="true"';
-            html+=' ondragstart="GridPlan._scDragStart(event,\''+E(sc.id)+'\',\''+date+'\')"';
-            html+=' ondragend="GridPlan._scDragEnd(event)">';
-            html+='<span class="gp-scene-lock" title="'+lockTitle+'">'+lockIcon+'</span>';
-            html+='<span class="gp-scene-chip" onclick="App.jumpToScene(\''+E(sc.id)+'\')" title="Szene öffnen">↗ '+EQ(sc.title||'Szene')+'</span>';
-            html+='</div>';
+          cellScenes.forEach(({sc,locked,isCard})=>{
+            if(isCard){
+              const lockIcon=locked?'🔒':'⟳';
+              const tt=locked?'Planer-Block · Manuelles Datum':'Planer-Block · Errechnetes Datum – Verschieben setzt festes Datum';
+              html+='<div class="gp-scene-row gp-scene-card'+(locked?'':' gp-scene-auto')+'" draggable="true"';
+              html+=' ondragstart="GridPlan._scDragStart(event,\''+E(sc.id)+'\',\''+date+'\',true)"';
+              html+=' ondragend="GridPlan._scDragEnd(event)">';
+              html+='<span class="gp-scene-lock" title="'+tt+'">'+lockIcon+'</span>';
+              html+='<span class="gp-scene-chip gp-card-chip" onclick="try{plannerFocusCard(\''+E(sc.id)+'\');}catch(_){App.switchTab(\'planner\',document.querySelector(\'[data-tab=planner]\'))}" title="Planer-Block öffnen">⊡ '+EQ(sc.title||'Planer-Block')+'</span>';
+              html+='</div>';
+            } else {
+              const lockIcon=locked?'🔒':'⟳';
+              const lockTitle=locked?'Manuelles Datum – im Editor bearbeiten':'Errechnetes Datum – Verschieben sperrt es';
+              html+='<div class="gp-scene-row'+(locked?'':' gp-scene-auto')+'" draggable="true"';
+              html+=' ondragstart="GridPlan._scDragStart(event,\''+E(sc.id)+'\',\''+date+'\')"';
+              html+=' ondragend="GridPlan._scDragEnd(event)">';
+              html+='<span class="gp-scene-lock" title="'+lockTitle+'">'+lockIcon+'</span>';
+              html+='<span class="gp-scene-chip" onclick="App.jumpToScene(\''+E(sc.id)+'\')" title="Szene öffnen">↗ '+EQ(sc.title||'Szene')+'</span>';
+              html+='</div>';
+            }
           });
           html+='</div>';
         }
@@ -7403,12 +7703,12 @@ const GridPlan = (() => {
           chips=scs.map(sc=>{
             const ed=effDate(sc), lockIcon=sc.timelineStart?'🔒':ed?'⟳':'';
             const dateStr=ed?(' <span style="font-family:var(--mono);font-size:8px;color:var(--text3);opacity:.7">'+ed.slice(5)+'</span>'):'';
-            return '<div class="gp-scene-row'+(sc.timelineStart?'':' gp-scene-auto')+'"><span class="gp-scene-chip" onclick="App.jumpToScene(\''+E(sc.id)+'\')" title="'+E(sc.title||'')+'">'+lockIcon+' ↗ '+EQ(sc.title||'Szene')+'</span>'+dateStr+'</div>';
+            return '<div class="gp-scene-row'+(sc.timelineStart?'':' gp-scene-auto')+'" draggable="true" ondragstart="GridPlan._chScDragStart(event,\''+E(sc.id)+'\',\''+E(ch.id)+'\',\''+E(s.id)+'\')" ondragend="GridPlan._scDragEnd(event)"><span class="gp-scene-lock">'+lockIcon+'</span><span class="gp-scene-chip" onclick="App.jumpToScene(\''+E(sc.id)+'\')" title="'+E(sc.title||'')+'">↗ '+EQ(sc.title||'Szene')+'</span>'+dateStr+'</div>';
           }).join('');
         }catch(_){}
         const chLinkBtn='<button class="gp-cell-btn" onclick="GridPlan.openChLinkModal(\''+E(ch.id)+'\',\''+E(s.id)+'\')" title="Szene verknüpfen">⊕ Szene</button>'
               +'<button class="gp-cell-btn" onclick="GridPlan.createChScene(\''+E(ch.id)+'\',\''+E(s.id)+'\')" title="Neue Szene">＋ Neu</button>';
-        html+='<td class="gp-td-cell'+(stored.note||chips?' has-content':'')+'"><div class="gp-cell-inner"><textarea class="gp-cell-note" rows="2" placeholder="'+EQ(s.label||s.name||'...')+'" data-notekey="'+k+'" onblur="GridPlan.onChNoteBlur(this)">'+E(stored.note||'')+'</textarea><div class="gp-scene-list">'+chips+'</div><div class="gp-cell-footer">'+chLinkBtn+'</div></div></td>';
+        html+='<td class="gp-td-cell'+(stored.note||chips?' has-content':'')+' ch-cell" data-ch="'+E(ch.id)+'" data-strand="'+E(s.id)+'" ondragover="event.preventDefault();this.classList.add(\'gp-drop-over\')" ondragleave="this.classList.remove(\'gp-drop-over\')" ondrop="GridPlan.onChCellDrop(event,\''+E(ch.id)+'\',\''+E(s.id)+'\');this.classList.remove(\'gp-drop-over\')"><div class="gp-cell-inner"><textarea class="gp-cell-note" rows="2" placeholder="'+EQ(s.label||s.name||'...')+'" data-notekey="'+k+'" onblur="GridPlan.onChNoteBlur(this)">'+E(stored.note||'')+'</textarea><div class="gp-scene-list">'+chips+'</div><div class="gp-cell-footer">'+chLinkBtn+'</div></div></td>';
       });
       html+='</tr>';
     });
@@ -7498,12 +7798,50 @@ const GridPlan = (() => {
     } catch(e){ console.error(e); _toast('Fehler.','err'); closeModal(); }
   }
 
+  /* ── CHAPTER DRAG & DROP ──────────────────────────────────────── */
+  let _chDrag = null;
+  function _chScDragStart(e, scId, fromChId, fromStrandId) {
+    _chDrag = { scId, fromChId, fromStrandId };
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', scId);
+    e.target.style.opacity = '0.4';
+    e.stopPropagation();
+  }
+  function onChCellDrop(e, toChId, toStrandId) {
+    e.preventDefault();
+    document.querySelectorAll('.ch-cell').forEach(td => td.classList.remove('gp-drop-over'));
+    if (!_chDrag) return;
+    const { scId, fromChId, fromStrandId } = _chDrag;
+    _chDrag = null;
+    if (fromChId === toChId && fromStrandId === toStrandId) return;
+    let foundSc = null, fromCh = null, toCh = null;
+    for (const v of state.volumes) {
+      for (const ch of (v.chapters||[])) {
+        if (ch.id === fromChId) fromCh = ch;
+        if (ch.id === toChId) toCh = ch;
+        const sc = (ch.scenes||[]).find(s=>s.id===scId);
+        if (sc) foundSc = sc;
+      }
+    }
+    if (!foundSc || !fromCh || !toCh) { _toast('Szene nicht gefunden.','err'); return; }
+    if (fromChId !== toChId) {
+      fromCh.scenes = (fromCh.scenes||[]).filter(s=>s.id!==scId);
+      if (!toCh.scenes) toCh.scenes = [];
+      toCh.scenes.push(foundSc);
+    }
+    if (foundSc.plotStrand !== toStrandId) foundSc.plotStrand = toStrandId;
+    try { saveState(); } catch(_){}
+    render();
+    _toast('Szene verschoben: ' + (foundSc.title||'—'), 'ok');
+  }
+
   return { init, render, syncStrands, onRangeChange, setMode, toggleHideEmpty,
     onDayNoteBlur, onCellNoteBlur, onChNoteBlur,
     openLinkModal, closeLinkModal, filterLinkList, pickScene, unlinkScene,
     openChLinkModal, createChScene, doCreateCh,
     createScene, doCreate, exportCSV,
-    onCellDrop, _scDragStart, _scDragEnd };
+    onCellDrop, _scDragStart, _scDragEnd,
+    _chScDragStart, onChCellDrop };
 })();
 window.GridPlan = GridPlan;
 
@@ -7529,7 +7867,11 @@ const ProjectMgr = (() => {
       ps.unshift({id:'default', name:'Hauptprojekt'});
       _lsSave(ps);
     }
-    if (!localStorage.getItem(LS_ACTIVE)) localStorage.setItem(LS_ACTIVE,'default');
+    // Always validate activeProject against known projects; reset to default if stale
+    const curActive = localStorage.getItem(LS_ACTIVE);
+    if (!curActive || !ps.find(p=>p.id===curActive)) {
+      localStorage.setItem(LS_ACTIVE, 'default');
+    }
     _updateBtn();
   }
 
@@ -7537,7 +7879,12 @@ const ProjectMgr = (() => {
     const ps=_ls(), id=_activeId();
     const cur=ps.find(p=>p.id===id)||ps[0]||{name:'Projekt'};
     const btn=document.getElementById('proj-btn');
-    if (btn) btn.textContent='📁 '+cur.name;
+    if (!btn) return;
+    if (cur.cover) {
+      btn.innerHTML='<img src="'+cur.cover+'" style="width:14px;height:18px;border-radius:2px;object-fit:cover;vertical-align:middle;margin-right:5px;flex-shrink:0">'+esc(cur.name);
+    } else {
+      btn.textContent='📁 '+cur.name;
+    }
   }
 
   function toggleMenu(e) {
@@ -7547,7 +7894,6 @@ const ProjectMgr = (() => {
     if (menu.classList.contains('open')) { menu.classList.remove('open'); return; }
     _renderMenu();
     menu.classList.add('open');
-    // Position under button
     const r=e.currentTarget.getBoundingClientRect();
     menu.style.top=(r.bottom+2)+'px'; menu.style.left=r.left+'px';
     setTimeout(()=>document.addEventListener('click',_closeMenu,{once:true}),10);
@@ -7563,35 +7909,42 @@ const ProjectMgr = (() => {
     let h='';
     ps.forEach(p=>{
       const active=p.id===id;
-      h+='<div class="proj-item'+(active?' active':'')+'">'
-        +'<span class="proj-item-name" onclick="ProjectMgr.switchTo(\''+p.id+'\')">'+(active?'● ':'')+p.name+'</span>'
+      const coverHtml = p.cover
+        ? '<img src="'+p.cover+'" style="width:20px;height:26px;border-radius:2px;object-fit:cover;flex-shrink:0">'
+        : '<div style="width:20px;height:26px;border-radius:2px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0">📚</div>';
+      h+='<div class="proj-item'+(active?' active':'')+'">'+coverHtml
+        +'<span class="proj-item-name" onclick="ProjectMgr.switchTo(\''+p.id+'\')">'+(active?'● ':'')+esc(p.name)+'</span>'
         +(p.id!=='default'?'<button class="proj-item-del" onclick="event.stopPropagation();ProjectMgr.deleteProject(\''+p.id+'\')">✕</button>':'')
         +'</div>';
     });
     h+='<div class="proj-menu-footer">'
       +'<button class="zoom-btn" style="font-size:10px" onclick="ProjectMgr.newProject()">＋ Neues Projekt</button>'
       +'<button class="zoom-btn" style="font-size:10px" onclick="ProjectMgr.renameProject()">✎ Umbenennen</button>'
+      +'<label class="zoom-btn" style="font-size:10px;cursor:pointer" title="Buchcover hochladen (JPG/PNG)">🖼 Cover<input type="file" accept="image/*" style="display:none" onchange="ProjectMgr.uploadCover(event)"></label>'
       +'</div>';
     menu.innerHTML=h;
   }
-
   async function switchTo(id) {
     _closeMenu();
     const cur=_activeId();
     if (cur===id) return;
     // Save current state under current project key
-    try { await DB.set('state_'+cur, JSON.parse(JSON.stringify(state))); } catch(e){ console.warn(e); }
+    const curKey = cur === 'default' ? 'state' : 'state_' + cur;
+    try { await DB.set(curKey, JSON.parse(JSON.stringify(state))); } catch(e){ console.warn(e); }
+    // Set active project BEFORE loading so _stateKey() returns correct key
+    localStorage.setItem(LS_ACTIVE, id);
     // Load new project state
     try {
-      const s=await DB.get('state_'+id);
+      const newKey = id === 'default' ? 'state' : 'state_' + id;
+      const s = await DB.get(newKey);
       if (s) { state=Object.assign(defaultState(),s); state.ui=Object.assign(defaultState().ui,s.ui||{}); }
       else state=defaultState();
     } catch(_){ state=defaultState(); }
-    localStorage.setItem(LS_ACTIVE, id);
     _updateBtn();
     // Reset beats and grid for new project (they use separate localStorage keys per project)
     try { Beats.init(); } catch(_){}
     try { GridPlan.init(); } catch(_){}
+    try { SpotifyWidget.init(); } catch(_){}
     expandAll(); render();
     toast('Projekt geladen: '+(_ls().find(p=>p.id===id)||{}).name,'ok');
   }
@@ -7627,7 +7980,54 @@ const ProjectMgr = (() => {
     toast('Projekt gelöscht.','ok');
   }
 
-  return { init, toggleMenu, switchTo, newProject, renameProject, deleteProject };
+  function uploadCover(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxH = 300, maxW = 200;
+        const ratio = Math.min(maxW/img.width, maxH/img.height, 1);
+        canvas.width = Math.round(img.width*ratio);
+        canvas.height = Math.round(img.height*ratio);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+        const ps = _ls(), id = _activeId();
+        const p = ps.find(x=>x.id===id); if (!p) return;
+        p.cover = dataUrl;
+        _lsSave(ps);
+        _updateBtn();
+        _applyHeaderCover(dataUrl);
+        try { showToast('Cover gesetzt', 'ok'); } catch(_) {}
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function _applyHeaderCover(cover) {
+    const logo = document.getElementById('app-logo');
+    if (!logo) return;
+    if (cover) {
+      logo.style.backgroundImage = 'url('+cover+')';
+      logo.style.backgroundSize = 'contain';
+      logo.style.backgroundRepeat = 'no-repeat';
+      logo.style.backgroundPosition = 'right center';
+      logo.style.paddingRight = '34px';
+    } else {
+      logo.style.backgroundImage = '';
+      logo.style.paddingRight = '';
+    }
+  }
+
+  function _initCover() {
+    const ps = _ls(), id = _activeId();
+    const p = ps.find(x=>x.id===id);
+    if (p && p.cover) _applyHeaderCover(p.cover);
+  }
+
+  return { init, toggleMenu, switchTo, newProject, renameProject, deleteProject, uploadCover, _initCover };
 })();
 window.ProjectMgr = ProjectMgr;
 
@@ -7635,26 +8035,26 @@ window.ProjectMgr = ProjectMgr;
 
 /* ── SPOTIFY WIDGET (multi-playlist) ────────────────────────── */
 const SpotifyWidget = (() => {
-  const LS = 'skriptorium.spotify.v2';
+  const lsKey = () => 'skriptorium.spotify.v2.' + _activeProjectId();
   let _open = false;
   let _playlists = []; // [{id, name, url}]
   let _active = 0;     // index of currently shown playlist
 
   function _save() {
-    try { localStorage.setItem(LS, JSON.stringify({open:_open, playlists:_playlists, active:_active})); } catch(_){}
+    try { localStorage.setItem(lsKey(), JSON.stringify({open:_open, playlists:_playlists, active:_active})); } catch(_){}
   }
 
   function init() {
     // Migrate from v1
     try {
-      const old = JSON.parse(localStorage.getItem('skriptorium.spotify')||'{}');
+      const old = JSON.parse(localStorage.getItem('skriptorium.spotify')||'{}');  // v1 migration
       if (old.url && !localStorage.getItem(LS)) {
         _playlists = [{id:'p1', name:'Playlist 1', url:old.url}];
         _open = !!old.open; _active = 0; _save();
       }
     } catch(_){}
     try {
-      const d = JSON.parse(localStorage.getItem(LS)||'{}');
+      const d = JSON.parse(localStorage.getItem(lsKey())||'{}')||{};
       _open = !!d.open;
       _playlists = Array.isArray(d.playlists) ? d.playlists : [];
       _active = d.active||0;
@@ -7882,7 +8282,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { Help.bind(); } catch(_) {}
   try { Beats.init(); } catch(_) {}
   try { SpotifyWidget.init(); } catch(_) {}
-  try { ProjectMgr.init(); } catch(_) {}
+  try { ProjectMgr.init(); ProjectMgr._initCover?.(); } catch(_) {}
 });
 
 
