@@ -1,6 +1,6 @@
 # Skriptorium — Projekt-Dokumentation
 
-Version: 2.1 | Aktualisiert: 25.02.2026
+Version: 2.3 | Aktualisiert: 26.02.2026
 
 ---
 
@@ -73,14 +73,34 @@ Monatsübersicht und Timeline-Balken. Synchron mit Raster und Planer.
 ## 10. Dashboard
 
 - Statistiken: Bände, Kapitel, Szenen, Wörter
-- **Beat-Fortschritt:** Pro Board/Phase — Balken und % der abgeschlossenen Beats
+- **Beat-Fortschritt:** Pro Board/Phase — Doppelbalken (gedämpft = in Arbeit, voll = fertig) und % der abgeschlossenen Beats. Unterstützt jetzt mehrere Szenen pro Beat.
+- **Buchcover:** Das Buchcover wird prominent oben im Dashboard angezeigt (80×120 px). Upload direkt im Dashboard über ✎ oder über das 📁 Projekt-Menü.
 - „Next up" — nächste offene Szenen und Planer-Karten
 
 ## 11. Buchansicht / Storyboard / Suche
 
 Buchansicht: alle Szenen als Lesefassung. Storyboard: visuelle Kartenplanung. Suche: Volltext.
 
-## 12. Spotify-Widget (rechte Sidebar)
+## 12. Einstellungen (⚙-Tab)
+
+Einstellungen-Tab ganz rechts in der Tab-Leiste:
+
+**Schrift & Darstellung:**
+- Schriftgröße Editor (10–30 px)
+- Schriftart: Serif (Georgia) / Sans (System UI) / Mono (Courier)
+- UI-Zoom 80–120% (skaliert gesamte Oberfläche)
+
+**Farben:**
+- Akzentfarbe: 8 Voreinstellungen + freier Colorpicker
+- Hintergrundfarbe: 5 Dunkel-Presets + freier Picker — bg1–bg4 und Borders automatisch abgeleitet
+
+**Daten & Sicherung:** Alle Export/Import-Funktionen gesammelt (JSON, MD, Chars, Orte, HTML/Word)
+
+**Fehler-Konsole:** Erfasst `console.error`, `console.warn` und globale Exceptions ab Seitenstart. Zur Diagnose ohne Browser-DevTools.
+
+**Wiederherstellungs-Assistent** und **Speicher-Info** ebenfalls hier.
+
+## 13. Spotify-Widget (rechte Sidebar)
 
 Mehrere Playlists anpinnen (Link + ▶ + Name). Chips zum Wechseln. Pro Projekt getrennt.
 
@@ -94,6 +114,7 @@ Der **„↓ JSON"-Export** im Header enthält **alles** in einer Datei:
 
 | Daten | Enthalten? |
 |---|---|
+| **Alle Projekte** (inkl. Beats, Raster, Spotify) | ✅ `_allProjects` |
 | Bände, Kapitel, Szenen | ✅ |
 | Charaktere, Orte | ✅ |
 | Planer-Karten + Reihenfolge | ✅ |
@@ -129,6 +150,19 @@ Diese Module speichern in localStorage für schnelle, synchrone Zugriffe ohne In
 - **IndexedDB** (`TrilogyWriterV3`) — Hauptstate, project-scoped (`state` / `state_<id>`)
 - **localStorage** — Beats, Grid, Spotify (Keys: `skriptorium.*.v2.<projektId>`)
 - **Leaflet.js** — Weltkarte (CDN, einmalig Internet nötig)
+
+---
+
+# Bekannte Fixes (v2.3 / v2.2)
+
+- **Grid-Datum korrupt / nicht gespeichert:** Kritischer Bug behoben — `lsKey()` wurde in `load()`/`save()` nicht korrekt aufgerufen (`LS` war undefined), dadurch wurden alle Grid-Daten unter dem falschen Key gespeichert.
+- **Beat-Fortschritt Dashboard:** Unterstützt jetzt `sceneIds[]` (mehrere Szenen pro Beat). Doppelbalken zeigt In-Arbeit + Fertig getrennt.
+- **Multi-Projekt-Export:** `↓ JSON` exportiert jetzt *alle* Projekte, nicht nur das aktive. Import stellt alle Projekte wieder her.
+- **Spotify abgeschnitten:** `min-height:0` an Timeline-Bereichen verhindert, dass das Widget aus dem Viewport geschoben wird. Max-Höhe viewport-relativ.
+- **Cover prominent:** Buchcover erscheint als Hero-Block oben im Dashboard.
+- **Wiederherstellungs-Button:** Unauffälliges `⚠`-Icon statt prominenter gelber Button im Header.
+- **Einstellungsseite (v2.3):** Neuer ⚙-Tab mit Schriftgröße, Schriftart, UI-Zoom, Akzent- und Hintergrundfarbe, allen Export/Import-Funktionen, Fehler-Konsole und Wiederherstellungs-Assistent.
+- **Syntaxfehler (v2.3):** Mehrzeiliger `confirm()`-String mit Literal-Newlines korrigiert.
 
 ---
 

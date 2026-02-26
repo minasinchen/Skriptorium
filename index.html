@@ -382,8 +382,8 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
   background:none;border:1px solid var(--border);padding:2px 6px;cursor:pointer;
   text-transform:uppercase;transition:all .1s}
 .zoom-btn:hover,.zoom-btn.active{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
-#tl-bar-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px}
-#tl-cal-area{flex:1;overflow-y:auto;padding:8px;display:none}
+#tl-bar-area{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px;min-height:0}
+#tl-cal-area{flex:1;overflow-y:auto;padding:8px;display:none;min-height:0}
 #tl-month-area{flex:1;overflow-y:auto;padding:8px;display:none}
 .mo-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .mo-title{font-weight:700;letter-spacing:.01em}
@@ -953,7 +953,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 #spotify-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--text3);flex:1}
 #spotify-chevron{font-size:9px;color:var(--text3);transition:transform .15s}
-#spotify-body{padding:8px 10px 10px;overflow-y:auto;max-height:340px}
+#spotify-body{padding:8px 10px 10px;overflow-y:auto;max-height:min(300px,28vh)}
 #spotify-input-row{display:flex;gap:5px;margin-bottom:8px}
 #spotify-url-inp{flex:1;font-family:var(--mono);font-size:10px;background:var(--bg3);
   border:1px solid var(--border2);color:var(--text);padding:4px 7px;outline:none;min-width:0}
@@ -1083,23 +1083,16 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 <!-- HEADER -->
 <div id="hdr">
   <div id="app-logo">✦ Skriptorium</div>
-  <button class="hbtn" style="color:#f6ad55;border-color:#f6ad55;font-weight:bold" onclick="App.showRecovery()" title="Daten wiederherstellen">⚠ Daten-Wiederherstellung</button>
   <div id="proj-switcher">
     <button id="proj-btn" onclick="ProjectMgr.toggleMenu(event)" title="Projekt wechseln">📁 Projekt</button>
     <div id="proj-menu"></div>
   </div>
   <div id="daily-badge">Heute: <span id="daily-count">0</span> Wörter</div>
   <div class="hdr-sep"></div>
-  <button class="hbtn" onclick="App.importMD()">↑ .md</button>
-  <button class="hbtn" onclick="App.importProject()">↑ JSON</button>
-  <button class="hbtn" onclick="App.importChars()">↑ Chars</button>
-  <button class="hbtn" onclick="App.importLocs()">↑ Orte/JSON</button>
-  <button class="hbtn" onclick="App.exportProject()">↓ JSON</button>
-  <button class="hbtn" onclick="App.exportCharsJSON()">↓ Chars</button>
-  <button class="hbtn" onclick="App.exportLocsJSON()">↓ Orte</button>
-  <button class="hbtn" onclick="App.exportHTML()">↓ HTML/Word</button>
-  <button class="hbtn" onclick="App.exportMarkdown()">↓ Markdown</button>
+  <button class="hbtn" onclick="App.exportProject()" title="Alle Projekte als JSON sichern">↓ JSON</button>
+  <button class="hbtn" onclick="App.importProject()" title="JSON importieren">↑ JSON</button>
   <button class="hbtn" onclick="Help.open()" title="Hilfe (F1)">❓ Hilfe</button>
+  <button class="hbtn" onclick="App.switchTab('settings',document.querySelector('[data-tab=settings]'))" title="Einstellungen, Export/Import, Fehler-Konsole">⚙</button>
   <button class="hbtn danger" onclick="App.resetAll()">⊗ Reset</button>
 </div>
 
@@ -1130,6 +1123,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
     <button class="tab-btn" data-tab="storyboard" onclick="App.switchTab('storyboard',this)">Storyboard</button>
     <button class="tab-btn" data-tab="map" onclick="App.switchTab('map',this)">Weltkarte</button>
     <button class="tab-btn" data-tab="dashboard" onclick="App.switchTab('dashboard',this)">Dashboard</button>
+    <button class="tab-btn" data-tab="settings" onclick="App.switchTab('settings',this)" style="display:none">⚙</button>
   </div>
   <div id="tab-content">
 
@@ -1542,6 +1536,10 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
       <div id="dash-panel"></div>
     </div>
 
+    <div class="tab-panel" id="panel-settings">
+      <div id="settings-panel" style="max-width:680px;margin:0 auto;padding:24px 20px;overflow-y:auto;height:100%"></div>
+    </div>
+
   </div>
 </div>
 
@@ -1951,6 +1949,9 @@ const DB = {
   },
   clear() {
     return new Promise((res,rej)=>{const t=this._db.transaction('data','readwrite');const r=t.objectStore('data').clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});
+  },
+  getAllKeys() {
+    return new Promise((res,rej)=>{const t=this._db.transaction('data','readonly');const r=t.objectStore('data').getAllKeys();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});
   }
 };
 
@@ -3034,7 +3035,26 @@ function renderDashboard() {
   const pctTotal = totalGoal>0?Math.min(100,Math.round(totalW/totalGoal*100)):0;
   const strands = getStrands();
 
-  let html=`<div class="dash-grid">
+  // Cover
+  const _projList2 = (() => { try { return JSON.parse(localStorage.getItem('skriptorium.projects')||'[]'); } catch(_){ return []; } })();
+  const _activeId2 = localStorage.getItem('skriptorium.activeProject')||'default';
+  const _proj2 = _projList2.find(p=>p.id===_activeId2)||{name:'Hauptprojekt'};
+  const _cover2 = _proj2.cover||null;
+  let html = '';
+  if (_cover2) {
+    html += '<div class="dash-cover-hero"><img src="'+_cover2+'" class="dash-cover-img" alt="Cover">'+
+      '<div class="dash-cover-meta"><div class="dash-cover-title">'+esc(_proj2.name)+'</div>'+
+      '<div class="dash-cover-sub">'+fmtN(totalW)+' Wörter'+(totalGoal>0?' · '+pctTotal+'% Ziel':'')+'</div>'+
+      (totalGoal>0?'<div class="dash-cover-bar"><div class="dash-cover-fill" style="width:'+pctTotal+'%"></div></div>':'')+
+      '<label class="dash-cover-change">✎ Cover<input type="file" accept="image/*" style="display:none" onchange="ProjectMgr.uploadCover(event);setTimeout(renderDashboard,500)"></label>'+
+      '</div></div>';
+  } else {
+    html += '<div class="dash-cover-hero dash-cover-empty">'+
+      '<div class="dash-cover-placeholder"><label>🖼 Cover<input type="file" accept="image/*" style="display:none" onchange="ProjectMgr.uploadCover(event);setTimeout(renderDashboard,500)"></label></div>'+
+      '<div class="dash-cover-meta"><div class="dash-cover-title">'+esc(_proj2.name)+'</div>'+
+      '<div class="dash-cover-sub">'+fmtN(totalW)+' Wörter</div></div></div>';
+  }
+  html += `<div class="dash-grid">
     <div class="dash-stat"><div class="dsn">${state.volumes.length}</div><div class="dsl">Bände</div></div>
     <div class="dash-stat"><div class="dsn">${totalCh}</div><div class="dsl">Kapitel</div></div>
     <div class="dash-stat"><div class="dsn">${all.length}</div><div class="dsl">Szenen</div></div>
@@ -3165,40 +3185,43 @@ function _renderDashBeats(container) {
 
     let html = '<div class="dash-section">Beat-Fortschritt <span style="font-family:var(--mono);font-size:8px;color:var(--text3);letter-spacing:0;font-weight:normal">(verknüpfte Szenen mit Status „Fertig")</span></div>';
 
+    const _scIds = b => { const ids=Array.isArray(b.sceneIds)?[...b.sceneIds]:[]; if(b.sceneId&&!ids.includes(b.sceneId))ids.push(b.sceneId); return ids; };
+    const _done  = b => _scIds(b).some(id=>{ const sc=allScenes.find(s=>s.id===id); return sc&&sc.status==='done'; });
+    const _prog  = b => !_done(b)&&_scIds(b).some(id=>{ const sc=allScenes.find(s=>s.id===id); return sc&&(sc.status==='draft'||sc.status==='revise'); });
+
     bState.boards.forEach(board => {
       const phases = board.phases || [];
-      const beats = board.beats || [];
+      const beats  = board.beats  || [];
       if (!beats.length) return;
-      const linkedBeats = beats.filter(b=>b.sceneId);
-      const doneBeats = linkedBeats.filter(b=>{ const sc=allScenes.find(s=>s.id===b.sceneId); return sc&&sc.status==='done'; });
-      const totalBeats = beats.length;
-      const pct = totalBeats ? Math.round(doneBeats.length/totalBeats*100) : 0;
+      const done   = beats.filter(_done);
+      const prog   = beats.filter(_prog);
+      const total  = beats.length;
+      const pct    = total ? Math.round(done.length/total*100) : 0;
+      const ppct   = total ? Math.round((done.length+prog.length)/total*100) : 0;
 
       html += '<div class="dash-beats-board"><div class="dbb-head">'
         + '<span class="dbb-name">'+esc(board.name||'Board')+'</span>'
-        + '<span class="dbb-stat">'+doneBeats.length+'/'+totalBeats+' Beats · '+pct+'%</span>'
+        + '<span class="dbb-stat">'+done.length+'/'+total+' fertig'+(prog.length?' · '+prog.length+' in Arbeit':'')+'</span>'
         + '</div>';
-
-      // Phase bars
       html += '<div class="dbb-phases">';
       phases.forEach(ph=>{
-        const phBeats = beats.filter(b=>b.phaseId===ph.id);
-        if (!phBeats.length) return;
-        const phLinked = phBeats.filter(b=>b.sceneId);
-        const phDone = phLinked.filter(b=>{ const sc=allScenes.find(s=>s.id===b.sceneId); return sc&&sc.status==='done'; });
-        const phPct = phBeats.length ? Math.round(phDone.length/phBeats.length*100) : 0;
-        const phasePctTotal = totalBeats ? Math.round(phBeats.length/totalBeats*100) : 0;
+        const pb = beats.filter(b=>b.phaseId===ph.id);
+        if (!pb.length) return;
+        const pd = pb.filter(_done), pp = pb.filter(_prog);
+        const pct2  = pb.length ? Math.round(pd.length/pb.length*100) : 0;
+        const ppct2 = pb.length ? Math.round((pd.length+pp.length)/pb.length*100) : 0;
         html += '<div class="dbb-phase-row">'
           + '<span class="dbb-phase-name">'+esc(ph.name)+'</span>'
-          + '<span class="dbb-phase-meta">'+phBeats.length+' B · '+phasePctTotal+'%</span>'
-          + '<div class="dbb-track"><div class="dbb-fill-bg" style="width:'+phasePctTotal+'%">'
-          + '<div class="dbb-fill-done" style="width:'+phPct+'%"></div></div></div>'
+          + '<span class="dbb-phase-meta">'+pd.length+'/'+pb.length+' · '+pct2+'%</span>'
+          + '<div class="dbb-track" style="position:relative">'
+          + '<div style="position:absolute;inset:0;width:'+ppct2+'%;background:var(--sd);opacity:.3;border-radius:2px"></div>'
+          + '<div class="dbb-fill-done" style="width:'+pct2+'%"></div></div>'
           + '</div>';
       });
       html += '</div>';
-
-      // Overall bar
-      html += '<div class="dbb-total-bar"><div class="dbb-total-fill" style="width:'+pct+'%"></div></div>';
+      html += '<div class="dbb-total-bar" style="position:relative">'
+        + '<div style="position:absolute;inset:0;width:'+ppct+'%;background:var(--sd);opacity:.25;border-radius:2px"></div>'
+        + '<div class="dbb-total-fill" style="width:'+pct+'%"></div></div>';
       html += '</div>';
     });
 
@@ -4040,7 +4063,7 @@ const App = {
     if (btn) btn.classList.add('active');
     const tabMap={scene:'panel-scene',cork:'panel-cork',search:'panel-search',
       chars:'panel-chars',locs:'panel-locs',planner:'panel-planner',beats:'panel-beats',calendar:'panel-calendar',book:'panel-book',
-      storyboard:'panel-storyboard',map:'panel-map',dashboard:'panel-dashboard',grid:'panel-grid'};
+      storyboard:'panel-storyboard',map:'panel-map',dashboard:'panel-dashboard',grid:'panel-grid',settings:'panel-settings'};
     const p=document.getElementById(tabMap[tab]);
     if (p) p.classList.add('active');
     state.ui.activeTab=tab; saveState();
@@ -4056,6 +4079,7 @@ const App = {
     if (tab==='calendar') { renderCalendarFull(); }
     if (tab==='book') { renderBookView(); }
     if (tab==='storyboard') { renderStoryboard(); }
+    if (tab==='settings') { renderSettings(); }
   },
 
   toggleNavDates(btn) {
@@ -4714,13 +4738,27 @@ const App = {
 
   async exportProject() {
     await saveStateNow();
-    // Bundle beats, grid and spotify into export snapshot
+    const projects = (() => { try { return JSON.parse(localStorage.getItem('skriptorium.projects')||'[]'); } catch(_){ return []; } })();
+    const activeId = _activeProjectId();
+    const allProjects = [];
+    for (const proj of projects) {
+      const dbKey = proj.id === 'default' ? 'state' : 'state_' + proj.id;
+      let projState = null;
+      try { projState = proj.id === activeId ? JSON.parse(JSON.stringify(state)) : await DB.get(dbKey); } catch(_){}
+      if (!projState) continue;
+      projState._beats   = (() => { try { return JSON.parse(localStorage.getItem('skriptorium.beats.v2.'+proj.id)||'null'); } catch(_){ return null; } })();
+      projState._grid    = (() => { try { return JSON.parse(localStorage.getItem('skriptorium.chronik.v1.'+proj.id)||'null'); } catch(_){ return null; } })();
+      projState._spotify = (() => { try { return JSON.parse(localStorage.getItem('skriptorium.spotify.v2.'+proj.id)||'null'); } catch(_){ return null; } })();
+      allProjects.push({ projectMeta: proj, dbKey, state: projState });
+    }
+    // Also keep backwards-compat top-level fields for single-project import
     const snapshot = JSON.parse(JSON.stringify(state));
     try { snapshot._beats = JSON.parse(localStorage.getItem(lsKeyBeats())||'null'); } catch(_){}
-    try { snapshot._grid = JSON.parse(localStorage.getItem(lsKeyGrid())||'null'); } catch(_){}
+    try { snapshot._grid  = JSON.parse(localStorage.getItem(lsKeyGrid())||'null');  } catch(_){}
     try { snapshot._spotify = JSON.parse(localStorage.getItem(lsKeySpotify())||'null'); } catch(_){}
+    Object.assign(snapshot, { _skriptoriumExport:true, _version:3, _exportedAt:new Date().toISOString(), _activeProjectId:activeId, _projectList:projects, _allProjects:allProjects });
     download('skriptorium-export.json', JSON.stringify(snapshot,null,2));
-    toast('Export erfolgreich (inkl. Beats, Raster, Spotify)','ok');
+    toast('Export: '+allProjects.length+' Projekt(e) gesichert','ok');
   },
   exportHTML() {
     const html = buildHTMLExport();
@@ -4741,20 +4779,35 @@ const App = {
       readFile(f, async text=>{
         try {
           const p=JSON.parse(text);
-          state=Object.assign(defaultState(),p);
-          state.ui=Object.assign(defaultState().ui,p.ui||{});
-          // Restore beats if bundled
-          if (p._beats) { try { localStorage.setItem(lsKeyBeats(), JSON.stringify(p._beats)); } catch(_){} }
-          // Restore grid if bundled
-          if (p._grid) { try { localStorage.setItem(lsKeyGrid(), JSON.stringify(p._grid)); } catch(_){} }
-          // Restore spotify if bundled
-          if (p._spotify) { try { localStorage.setItem(lsKeySpotify(), JSON.stringify(p._spotify)); } catch(_){} }
+          // Multi-project export
+          if (p._skriptoriumExport && Array.isArray(p._allProjects) && p._allProjects.length > 1) {
+            if (!confirm('Diese Datei enthält '+p._allProjects.length+' Projekte.\nAlle Projekte werden importiert. Fortfahren?')) return;
+            localStorage.setItem('skriptorium.projects', JSON.stringify(p._projectList||[]));
+            for (const entry of p._allProjects) {
+              if (!entry.state||!entry.dbKey) continue;
+              const ps=Object.assign(defaultState(),entry.state); ps.ui=Object.assign(defaultState().ui,entry.state.ui||{});
+              try { await DB.set(entry.dbKey, ps); } catch(e){}
+              const pid=entry.projectMeta?.id||'default';
+              if (entry.state._beats)   try { localStorage.setItem('skriptorium.beats.v2.'+pid,   JSON.stringify(entry.state._beats));   } catch(_){}
+              if (entry.state._grid)    try { localStorage.setItem('skriptorium.chronik.v1.'+pid, JSON.stringify(entry.state._grid));    } catch(_){}
+              if (entry.state._spotify) try { localStorage.setItem('skriptorium.spotify.v2.'+pid,  JSON.stringify(entry.state._spotify)); } catch(_){}
+            }
+            const tid=p._activeProjectId||'default';
+            localStorage.setItem('skriptorium.activeProject', tid);
+            try { const s=await DB.get(tid==='default'?'state':'state_'+tid); if(s){state=Object.assign(defaultState(),s);state.ui=Object.assign(defaultState().ui,s.ui||{});} } catch(_){}
+            try { Beats.init(); } catch(_){} try { GridPlan.init(); } catch(_){} try { SpotifyWidget.init(); } catch(_){} try { ProjectMgr.init(); } catch(_){}
+            expandAll(); render();
+            toast('Import: '+p._allProjects.length+' Projekte wiederhergestellt','ok'); return;
+          }
+          // Single-project
+          state=Object.assign(defaultState(),p); state.ui=Object.assign(defaultState().ui,p.ui||{});
+          if (p._beats)   try { localStorage.setItem(lsKeyBeats(),   JSON.stringify(p._beats));   } catch(_){}
+          if (p._grid)    try { localStorage.setItem(lsKeyGrid(),    JSON.stringify(p._grid));    } catch(_){}
+          if (p._spotify) try { localStorage.setItem(lsKeySpotify(), JSON.stringify(p._spotify)); } catch(_){}
           await saveStateNow();
-          try { Beats.init(); } catch(_){}
-          try { GridPlan.init(); } catch(_){}
-          try { SpotifyWidget.init(); } catch(_){}
+          try { Beats.init(); } catch(_){} try { GridPlan.init(); } catch(_){} try { SpotifyWidget.init(); } catch(_){}
           expandAll(); render();
-          toast('Projekt importiert (inkl. Beats, Raster, Spotify)','ok');
+          toast('Projekt importiert','ok');
         } catch(e){toast('JSON-Fehler: '+e.message,'err');}
       });
     };
@@ -6444,6 +6497,56 @@ function buildHTMLExport() {
 .bigcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
 .bigcal-grid .mo-dow{padding:6px 0}
 
+
+/* ── DASHBOARD COVER ─────────────────────────────────────────── */
+.dash-cover-hero{display:flex;gap:14px;padding:14px 16px;background:var(--bg1);border-bottom:1px solid var(--border)}
+.dash-cover-hero.dash-cover-empty{align-items:center}
+.dash-cover-img{width:72px;height:108px;object-fit:cover;border-radius:3px;box-shadow:0 3px 12px rgba(0,0,0,.5);flex-shrink:0;border:1px solid var(--border2)}
+.dash-cover-meta{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:flex-end;min-width:0}
+.dash-cover-title{font-family:var(--font);font-size:14px;font-style:italic;color:var(--text);line-height:1.2}
+.dash-cover-sub{font-family:var(--mono);font-size:9px;color:var(--text3)}
+.dash-cover-bar{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.dash-cover-fill{height:100%;background:var(--accent);border-radius:2px}
+.dash-cover-change{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;display:inline-block}
+.dash-cover-change:hover{color:var(--accent)}
+.dash-cover-placeholder{width:72px;height:108px;border:1px dashed var(--border2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dash-cover-placeholder label{font-family:var(--mono);font-size:8px;color:var(--text3);cursor:pointer;text-align:center;padding:8px;line-height:1.5}
+.dash-cover-placeholder:hover{border-color:var(--accent2)}
+.dash-cover-placeholder label:hover{color:var(--accent)}
+
+/* ── SETTINGS PANEL ──────────────────────────────────────────── */
+.set-section{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text3);padding:14px 0 6px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.set-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
+.set-row:last-child{border-bottom:none}
+.set-lbl{font-family:var(--mono);font-size:10px;color:var(--text2);flex:1;min-width:0}
+.set-lbl small{display:block;font-size:9px;color:var(--text3);margin-top:1px}
+.set-inp{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);padding:4px 8px;outline:none;width:90px}
+.set-inp:focus{border-color:var(--accent2)}
+.set-sel{font-family:var(--mono);font-size:10px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);padding:3px 6px;outline:none;cursor:pointer}
+.set-btn{font-family:var(--mono);font-size:10px;background:none;border:1px solid var(--border2);
+  color:var(--text3);padding:4px 10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.set-btn:hover{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
+.set-btn.danger:hover{color:#fc8181;border-color:#742a2a}
+.set-btn.primary{color:var(--accent);border-color:var(--accent2)}
+.set-swatch-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.set-swatch{width:20px;height:20px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0}
+.set-swatch:hover,.set-swatch.active{border-color:var(--text)}
+.set-preview{font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg2);
+  border:1px solid var(--border);padding:10px 12px;border-radius:2px;line-height:1.6;margin-top:8px;font-style:italic}
+
+/* ── ERROR CONSOLE ───────────────────────────────────────────── */
+#err-console{font-family:var(--mono);font-size:9px;background:var(--bg0);border:1px solid var(--border2);
+  max-height:200px;overflow-y:auto;padding:2px 0;margin-top:8px;width:100%}
+.err-line{padding:3px 8px;border-bottom:1px solid var(--border);display:flex;gap:7px;align-items:baseline}
+.err-time{color:var(--text3);flex-shrink:0;font-size:8px}
+.err-type{flex-shrink:0;font-size:8px;padding:1px 4px;border-radius:2px}
+.err-type.e{background:rgba(252,129,129,.15);color:#fc8181}
+.err-type.w{background:rgba(246,173,85,.12);color:#f6ad55}
+.err-msg{color:var(--text2);word-break:break-all;flex:1;font-size:9px}
+.err-empty{padding:10px;color:var(--text3);text-align:center;font-size:9px}
 </style></head><body>
 `;
 
@@ -7332,10 +7435,10 @@ const GridPlan = (() => {
     return { start:toISO(t), end:toISO(e), mode:'date', hideEmpty:false, cells:{}, dayNotes:{} };
   }
   function load(){
-    try{ const r=localStorage.getItem(LS); if(r){ g=JSON.parse(r); if(!g.cells)g.cells={}; if(!g.dayNotes)g.dayNotes={}; return; } }catch(_){}
+    try{ const r=localStorage.getItem(lsKey()); if(r){ g=JSON.parse(r); if(!g.cells)g.cells={}; if(!g.dayNotes)g.dayNotes={}; return; } }catch(_){}
     g=mkDefault();
   }
-  function save(){ try{ localStorage.setItem(LS,JSON.stringify(g)); }catch(_){} }
+  function save(){ try{ localStorage.setItem(lsKey(),JSON.stringify(g)); }catch(_){} }
 
   /* ── CELL STATE ───────────────────────────────────────────────── */
   const ck=(date,sid)=>date+'::'+sid;
@@ -8283,7 +8386,141 @@ document.addEventListener('DOMContentLoaded', () => {
   try { Beats.init(); } catch(_) {}
   try { SpotifyWidget.init(); } catch(_) {}
   try { ProjectMgr.init(); ProjectMgr._initCover?.(); } catch(_) {}
+  try { SettingsState.load(); } catch(_) {}
 });
+
+
+// ── ERROR CONSOLE ─────────────────────────────────────────────
+const ErrConsole = (() => {
+  const MAX = 100, logs = [];
+  const _oe = console.error.bind(console), _ow = console.warn.bind(console);
+  const _push = (type, args) => {
+    const msg = args.map(a => { try { return a instanceof Error ? a.message : typeof a==='object'&&a?JSON.stringify(a):String(a); } catch(_){ return '[obj]'; } }).join(' ');
+    const t = new Date(), ts = [t.getHours(),t.getMinutes(),t.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');
+    logs.push({type,msg,ts}); if (logs.length>MAX) logs.shift();
+  };
+  console.error = function(...a){ _push('e',a); _oe(...a); };
+  console.warn  = function(...a){ _push('w',a); _ow(...a); };
+  window.addEventListener('error', e=>_push('e',[e.message+' ('+((e.filename||'').split('/').pop())+':'+e.lineno+')']));
+  window.addEventListener('unhandledrejection', e=>_push('e',['Promise: '+((e.reason&&e.reason.message)||String(e.reason))]));
+  function render(el) {
+    if (!el) return;
+    if (!logs.length) { el.innerHTML = '<div class="err-empty">Keine Fehler — alles gut \u2713</div>'; return; }
+    const h = s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    el.innerHTML = [...logs].reverse().map(l=>'<div class="err-line"><span class="err-time">'+l.ts+'</span><span class="err-type '+l.type+'">'+(l.type==='e'?'ERR':'WARN')+'</span><span class="err-msg">'+h(l.msg)+'</span></div>').join('');
+  }
+  return { render, clear(){ logs.length=0; } };
+})();
+
+// ── SETTINGS STATE ─────────────────────────────────────────────
+const SettingsState = (() => {
+  const LS = 'skriptorium.settings.v1';
+  const def = () => ({ fontSize:14, uiScale:100, fontFamily:'serif', accent:'#c8a96e', bg:'#090909' });
+  let s = null;
+  const dark = hex => { try { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return '#'+[r,g,b].map(v=>Math.max(0,Math.round(v*.7)).toString(16).padStart(2,'0')).join(''); }catch(_){return '#7a6040';} };
+  const alph = (hex,a) => { try { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return 'rgba('+r+','+g+','+b+','+a+')'; }catch(_){return 'rgba(200,169,110,.1)';} };
+  function _apply() {
+    if (!s) return;
+    const R = document.documentElement;
+    R.style.setProperty('--accent', s.accent);
+    R.style.setProperty('--accent2', dark(s.accent));
+    R.style.setProperty('--accent-glow', alph(s.accent,.1));
+    if (s.bg) {
+      const p = h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+      const x = v=>Math.min(255,Math.max(0,v)).toString(16).padStart(2,'0');
+      try { const [r,g,b]=p(s.bg);
+        R.style.setProperty('--bg0','#'+[r,g,b].map(x).join(''));
+        R.style.setProperty('--bg1','#'+[r+8,g+8,b+8].map(x).join(''));
+        R.style.setProperty('--bg2','#'+[r+14,g+14,b+14].map(x).join(''));
+        R.style.setProperty('--bg3','#'+[r+22,g+22,b+22].map(x).join(''));
+        R.style.setProperty('--bg4','#'+[r+30,g+30,b+30].map(x).join(''));
+        R.style.setProperty('--border','#'+[r+26,g+26,b+26].map(x).join(''));
+        R.style.setProperty('--border2','#'+[r+38,g+38,b+38].map(x).join(''));
+      } catch(_){}
+    }
+    const fm = {serif:"Georgia,'Times New Roman',serif",sans:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",mono:"'Courier New',Courier,monospace"};
+    R.style.setProperty('--font', fm[s.fontFamily]||fm.serif);
+    let el=document.getElementById('_s-dyn'); if(!el){el=document.createElement('style');el.id='_s-dyn';document.head.appendChild(el);}
+    el.textContent='#scene-text,#scene-txt,textarea.sc-text{font-size:'+s.fontSize+'px!important}';
+    document.body.style.fontSize=(s.uiScale&&s.uiScale!==100)?(s.uiScale/100)+'em':'';
+  }
+  return {
+    load(){ try{const r=localStorage.getItem(LS);s=r?Object.assign(def(),JSON.parse(r)):def();}catch(_){s=def();} _apply(); },
+    get(){ return s||def(); },
+    set(patch){ if(!s)s=def(); Object.assign(s,patch); try{localStorage.setItem(LS,JSON.stringify(s));}catch(_){} _apply(); }
+  };
+})();
+
+// ── RENDER SETTINGS ────────────────────────────────────────────
+function renderSettings() {
+  const panel = document.getElementById('settings-panel');
+  if (!panel) return;
+  const s = SettingsState.get();
+  const ACCENTS = ['#c8a96e','#e07a5f','#81b29a','#6ba3d6','#c47fba','#d4a373','#7bb8a6','#e8b86d'];
+  const BGS     = ['#090909','#0d0d0d','#111118','#0c0f0f','#0f0c09'];
+  const FONTS   = [{v:'serif',l:'Georgia (Serif)'},{v:'sans',l:'System UI (Sans)'},{v:'mono',l:'Courier (Mono)'}];
+  const sw = (arr,cur,fn) => arr.map(c=>'<div class="set-swatch'+(cur===c?' active':'')+'" style="background:'+c+'" onclick="'+fn.replace(/C/g,c)+'" title="'+c+'"></div>').join('');
+
+  panel.innerHTML =
+    '<div class="set-section">Schrift &amp; Darstellung</div>'+
+    '<div class="set-row"><div class="set-lbl">Schriftgr\u00f6\u00dfe Editor<small>px, 10\u201330</small></div>'+
+    '<input class="set-inp" type="number" min="10" max="30" value="'+s.fontSize+'" onchange="SettingsState.set({fontSize:Math.min(30,Math.max(10,+this.value||14))})"></div>'+
+    '<div class="set-row"><div class="set-lbl">Schriftart</div>'+
+    '<select class="set-sel" onchange="SettingsState.set({fontFamily:this.value})">'+FONTS.map(f=>'<option value="'+f.v+'"'+(s.fontFamily===f.v?' selected':'')+'>'+f.l+'</option>').join('')+'</select></div>'+
+    '<div class="set-row"><div class="set-lbl">UI-Zoom<small>80\u2013120%</small></div>'+
+    '<select class="set-sel" onchange="SettingsState.set({uiScale:+this.value})">'+[80,90,100,110,120].map(v=>'<option value="'+v+'"'+(s.uiScale===v?' selected':'')+'>'+v+'%</option>').join('')+'</select></div>'+
+    '<div class="set-preview">Die Reise beginnt mit einem Schritt. \u2014 Vorschau Schriftart &amp; Gr\u00f6\u00dfe.</div>'+
+
+    '<div class="set-section" style="margin-top:16px">Farben</div>'+
+    '<div class="set-row"><div class="set-lbl">Akzentfarbe<small>Buttons, Tabs, aktive Elemente</small></div>'+
+    '<div class="set-swatch-row">'+sw(ACCENTS,s.accent,"SettingsState.set({accent:'C'});renderSettings()")+
+    '<input type="color" value="'+s.accent+'" style="width:28px;height:22px;padding:1px;cursor:pointer;background:none;border:1px solid var(--border2)" onchange="SettingsState.set({accent:this.value});renderSettings()"></div></div>'+
+    '<div class="set-row"><div class="set-lbl">Hintergrundfarbe<small>Basisfarbe, Zwischent\u00f6ne automatisch</small></div>'+
+    '<div class="set-swatch-row">'+sw(BGS,s.bg,"SettingsState.set({bg:'C'});renderSettings()")+
+    '<input type="color" value="'+(s.bg||'#090909')+'" style="width:28px;height:22px;padding:1px;cursor:pointer;background:none;border:1px solid var(--border2)" onchange="SettingsState.set({bg:this.value});renderSettings()"></div></div>'+
+    '<div class="set-row"><div class="set-lbl">Zur\u00fccksetzen<small>Alle Einstellungen auf Standard</small></div>'+
+    '<button class="set-btn danger" onclick="localStorage.removeItem(\'skriptorium.settings.v1\');SettingsState.load();renderSettings();toast(\'Einstellungen zur\u00fcckgesetzt\',\'ok\')">&#8630; Reset</button></div>'+
+
+    '<div class="set-section" style="margin-top:16px">Export &amp; Import</div>'+
+    '<div class="set-row"><div class="set-lbl">Alle Projekte sichern<small>JSON mit allen Projekten, Beats, Raster, Spotify</small></div><button class="set-btn primary" onclick="App.exportProject()">\u2193 JSON</button></div>'+
+    '<div class="set-row"><div class="set-lbl">Projekt importieren<small>Einzel- oder Mehrprojekt-JSON</small></div><button class="set-btn" onclick="App.importProject()">\u2191 JSON</button></div>'+
+    '<div class="set-row"><div class="set-lbl">Markdown importieren</div><button class="set-btn" onclick="App.importMD()">\u2191 .md</button></div>'+
+    '<div class="set-row"><div class="set-lbl">Charaktere</div><div style="display:flex;gap:5px"><button class="set-btn" onclick="App.exportCharsJSON()">\u2193</button><button class="set-btn" onclick="App.importChars()">\u2191</button></div></div>'+
+    '<div class="set-row"><div class="set-lbl">Orte</div><div style="display:flex;gap:5px"><button class="set-btn" onclick="App.exportLocsJSON()">\u2193</button><button class="set-btn" onclick="App.importLocs()">\u2191</button></div></div>'+
+    '<div class="set-row"><div class="set-lbl">HTML/Word-Export</div><button class="set-btn" onclick="App.exportHTML()">\u2193 HTML</button></div>'+
+    '<div class="set-row"><div class="set-lbl">Markdown-Export</div><button class="set-btn" onclick="App.exportMarkdown()">\u2193 MD</button></div>'+
+    '<div class="set-row"><div class="set-lbl">Speicher-Info</div><button class="set-btn" onclick="Settings_storageInfo()">\u2139 Anzeigen</button></div>'+
+
+    '<div class="set-section" style="margin-top:16px">&#9888; Daten-Wiederherstellung</div>'+
+    '<div class="set-row" style="flex-wrap:wrap;gap:6px"><div class="set-lbl">Notfall-Assistent f\u00fcr fehlende Projekte.<small>Scannt alle IndexedDB-Keys.</small></div>'+
+    '<button class="set-btn danger" onclick="App.showRecovery()">&#9888; Assistent \u00f6ffnen</button></div>'+
+
+    '<div class="set-section" style="margin-top:16px">Fehler-Konsole</div>'+
+    '<div class="set-row" style="flex-wrap:wrap;gap:6px">'+
+    '<div class="set-lbl">JS-Fehler und Warnungen dieser Sitzung.<small>Automatisch ab Seitenstart erfasst.</small></div>'+
+    '<div style="display:flex;gap:5px"><button class="set-btn" onclick="ErrConsole.render(document.getElementById(\'err-console\'))">&#8635;</button>'+
+    '<button class="set-btn danger" onclick="ErrConsole.clear();ErrConsole.render(document.getElementById(\'err-console\'))">&#10005;</button></div>'+
+    '</div>'+
+    '<div id="err-console"></div>'+
+
+    '<div class="set-section" style="margin-top:16px">Info</div>'+
+    '<div class="set-row"><div class="set-lbl">Skriptorium</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3)">2.2 \u2014 Feb 2026</div></div>';
+
+  ErrConsole.render(document.getElementById('err-console'));
+}
+
+function Settings_storageInfo() {
+  let used = 0;
+  for (let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('skriptorium'))used+=(localStorage.getItem(k)||'').length*2;}
+  const ps=(() => { try{return JSON.parse(localStorage.getItem('skriptorium.projects')||'[]');}catch(_){return[];} })();
+  const w=getAllScenes().reduce((a,{sc})=>a+countWords(sc.text||''),0);
+  showModal('<div class="modal-title">Speicher-Info</div>'+
+    '<div style="font-family:var(--mono);font-size:10px;line-height:2;color:var(--text2)">'+
+    'Projekte: <b style="color:var(--accent)">'+ps.length+'</b><br>'+
+    'W\u00f6rter: <b style="color:var(--accent)">'+fmtN(w)+'</b><br>'+
+    'localStorage: <b style="color:var(--accent)">'+(used/1024).toFixed(1)+' KB</b></div>'+
+    '<div class="modal-btns"><button class="mbtn primary" onclick="closeModal()">OK</button></div>');
+}
 
 
 init();
