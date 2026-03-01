@@ -14,7 +14,7 @@
   --si:#4a5568; --sd:#2d6a9f; --sr:#b7791f; --sk:#2d7a47;
   --sit:#a0aec0; --sdt:#63b3ed; --srt:#f6ad55; --skt:#68d391;
   --strand1:#9b59b6; --strand2:#e74c3c; --strand3:#2ecc71; --strand4:#3498db; --strand5:#f39c12;
-  --sidebar-w:268px; --timeline-w:252px;
+  --sidebar-w:268px; --timeline-w:300px;
   --font:Georgia,'Times New Roman',serif;
   --mono:'Courier New',Courier,monospace;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
@@ -120,7 +120,8 @@ body{background:var(--bg0);color:var(--text);font-family:var(--font);
 /* ── MAIN ───────────────────────────────────────────── */
 #main{grid-area:main;display:flex;flex-direction:column;overflow:hidden;background:var(--bg0)}
 #tab-bar{display:flex;align-items:flex-end;padding:0 16px;
-  border-bottom:1px solid var(--border);background:var(--bg1);gap:0;flex-shrink:0}
+  border-bottom:1px solid var(--border);background:var(--bg1);gap:0;flex-shrink:0;
+  overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .tab-btn{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--text3);
   background:none;border:none;border-bottom:2px solid transparent;
   padding:9px 14px 8px;cursor:pointer;transition:all .15s;text-transform:uppercase;white-space:nowrap}
@@ -523,6 +524,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 }
 .planner-card:hover { border-color: var(--border2); background: var(--bg3); }
 .planner-card.pc-dragging { opacity: .3; }
+.planner-card._kachel-card { border-left-style: dashed; }
 .planner-card.pc-drop-top { box-shadow: 0 -2px 0 0 var(--accent); }
 .planner-card.pc-drop-bottom { box-shadow: 0 2px 0 0 var(--accent); }
 .planner-col.pc-col-over { background: var(--accent-glow) !important; }
@@ -609,6 +611,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .beats-hint{font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.5;opacity:.9}
 .beats-grid{flex:1;overflow:auto;padding:14px 16px;
   display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;align-content:start}
+.beats-grid.cols-fixed{grid-template-columns:repeat(auto-fill,260px);overflow-x:auto;align-content:start}
 .beats-col{background:var(--bg1);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:220px}
 .beats-col-head{padding:10px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
 .beats-col-title{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -629,7 +632,46 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .beat-pct-chip{color:var(--accent2)!important;border-color:rgba(99,179,237,.3)!important;font-size:8px!important;opacity:.8}
 .beat-chip{font-family:var(--mono);font-size:9px;color:var(--text3);border:1px solid var(--border);padding:2px 7px;border-radius:999px}
 .beat-chip.link{color:var(--sd);border-color:rgba(45,106,159,.5)}
+.beat-chip.card-link{color:var(--accent);border-color:var(--accent2);opacity:.85}
 .beats-drop-over{outline:2px dashed var(--accent2);outline-offset:-6px;background:rgba(200,169,110,.06)}
+.beat-progress{height:2px;background:var(--border);margin-top:6px;border-radius:1px;overflow:hidden}
+.beat-progress-fill{height:100%;background:var(--accent);border-radius:1px;transition:width .3s}
+.beat-progress-lbl{font-family:var(--mono);font-size:8px;color:var(--text3);text-align:right;margin-top:2px}
+/* ── BEAT-NOTIZEN TABLE VIEW ────────────────────────────────────────── */
+.beats-notiz-bar{padding:6px 12px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.beats-notiz-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2)}
+/* scrollable single container */
+.bn-view-scroll{flex:1;overflow-y:auto;overflow-x:hidden}
+/* phase header row – full width, sticky */
+.bn-phase-row{font-family:var(--mono);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);padding:8px 14px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
+.bn-phase-row.bn-phase-row-muted{color:var(--text3)}
+.bn-phase-cnt{font-size:9px;color:var(--text3)}
+/* beat row = label left + cards right */
+.bn-beat-row{display:flex;min-height:70px;border-bottom:1px solid var(--border)}
+.bn-beat-label{flex:0 0 190px;padding:10px 12px;background:var(--bg0);border-right:1px solid var(--border);display:flex;flex-direction:column;gap:4px;position:sticky;left:0}
+.bn-beat-label-title{font-family:var(--font);font-size:12px;font-style:italic;color:var(--text2);line-height:1.3}
+.bn-beat-label-cnt{font-family:var(--mono);font-size:9px;color:var(--text3)}
+.bn-beat-add{margin-top:auto;align-self:flex-start}
+.bn-beat-cards{flex:1;padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+/* cards */
+.bn-kachel-card{padding:10px 14px;border:1px solid var(--border);border-left:3px solid var(--border2);background:var(--bg1);cursor:pointer;transition:background .1s}
+.bn-kachel-card:hover{background:var(--bg2)}
+.bn-card-title{font-family:var(--font);font-size:13px;font-style:italic;color:var(--text);margin-bottom:5px;line-height:1.3}
+.bn-card-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
+.bn-card-nometa{font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:5px;opacity:.45}
+.bn-card-note{font-family:var(--font);font-size:12px;color:var(--text2);line-height:1.65;white-space:pre-wrap}
+.bn-badge{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:2px;white-space:nowrap}
+.bn-badge-date{background:rgba(45,106,159,.15);color:var(--sdt)}
+.bn-badge-scene{background:rgba(45,122,71,.15);color:var(--skt)}
+.bn-badge-ort{background:rgba(74,85,104,.15);color:var(--sit)}
+.bn-beat-empty{padding:4px 0;opacity:.5}
+/* strand columns mode */
+.bn-sc-wrap{display:flex;gap:0;width:100%}
+.bn-sc{flex:1;min-width:180px;padding:8px 12px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px}
+.bn-sc:last-child{border-right:none}
+.bn-sc-hdr{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:2px}
+.bn-sc-add{align-self:flex-start;margin-top:2px}
+.bn-empty{padding:40px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3)}
 /* modal */
 .beats-modal{display:none;position:fixed;inset:0;z-index:2600;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:18px}
 .beats-modal.open{display:flex}
@@ -793,7 +835,10 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .book-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .book-label{font-family:var(--mono);font-size:10px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
 .book-sel{background:var(--bg1);border:1px solid var(--border2);color:var(--text);padding:4px 8px;font-family:var(--sans);font-size:12px;border-radius:10px}
-.book-area{overflow:auto;max-height:calc(100vh - 42px - 66px);padding:12px 0 28px;scrollbar-gutter:stable}
+.book-area{overflow-y:auto;padding:12px 0 28px;scrollbar-gutter:stable}
+#panel-book .bigcal-wrap{height:100%;display:flex;flex-direction:column;overflow:hidden}
+#panel-book .book-head{flex-shrink:0}
+#panel-book .book-area{flex:1;max-height:none}
 .book-vol{margin:10px 0 22px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .book-vol h2{font-size:20px;margin:10px 0 6px}
 .book-ch{margin:18px 0 18px}
@@ -953,7 +998,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 #spotify-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--text3);flex:1}
 #spotify-chevron{font-size:9px;color:var(--text3);transition:transform .15s}
-#spotify-body{padding:8px 10px 10px;overflow-y:auto;max-height:min(300px,28vh)}
+#spotify-body{padding:8px 10px 10px;overflow-y:auto;max-height:340px}
 #spotify-input-row{display:flex;gap:5px;margin-bottom:8px}
 #spotify-url-inp{flex:1;font-family:var(--mono);font-size:10px;background:var(--bg3);
   border:1px solid var(--border2);color:var(--text);padding:4px 7px;outline:none;min-width:0}
@@ -1076,6 +1121,191 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
 .gp-scene-card{border-left:2px solid var(--sr)!important}
 .gp-card-chip{color:var(--sr)!important;border-color:rgba(246,173,85,.3)!important}
 
+/* ── Month Overview: alias classes + better readability ───────────────── */
+.mo-legend-item{display:flex;align-items:center;gap:6px;color:var(--text2);font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.015)}
+.mo-legend-dot{width:10px;height:10px;border-radius:999px;border:1px solid var(--border);box-shadow:0 0 0 2px rgba(0,0,0,.15) inset}
+.mo-cell{border:1px solid var(--border);border-radius:12px;min-height:120px;padding:8px;display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.012)}
+.mo-cell.blank{border:0;background:transparent;min-height:0}
+.mo-cell.today{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(255,255,255,.03) inset}
+.mo-item-bar{width:6px;align-self:stretch;border-radius:6px;flex:0 0 auto;opacity:.95}
+.mo-item{background:rgba(0,0,0,.08)}
+/* Big calendar panel tweaks */
+.bigcal-wrap{max-width:1100px;margin:0 auto}
+.bigcal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.bigcal-title{font-size:18px;font-weight:750;letter-spacing:.01em;line-height:1.15}
+.bigcal-sub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px}
+.bigcal-legend{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin:10px 0 14px}
+.bigcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+.bigcal-grid .mo-dow{padding:6px 0}
+
+
+/* ── DASHBOARD COVER ─────────────────────────────────────────── */
+.dash-cover-hero{display:flex;gap:14px;padding:14px 16px;background:var(--bg1);border-bottom:1px solid var(--border)}
+.dash-cover-hero.dash-cover-empty{align-items:center}
+.dash-cover-img{width:72px;height:108px;object-fit:cover;border-radius:3px;box-shadow:0 3px 12px rgba(0,0,0,.5);flex-shrink:0;border:1px solid var(--border2)}
+.dash-cover-meta{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:flex-end;min-width:0}
+.dash-cover-title{font-family:var(--font);font-size:14px;font-style:italic;color:var(--text);line-height:1.2}
+.dash-cover-sub{font-family:var(--mono);font-size:9px;color:var(--text3)}
+.dash-cover-bar{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.dash-cover-fill{height:100%;background:var(--accent);border-radius:2px}
+.dash-cover-change{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;display:inline-block}
+.dash-cover-change:hover{color:var(--accent)}
+.dash-cover-placeholder{width:72px;height:108px;border:1px dashed var(--border2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dash-cover-placeholder label{font-family:var(--mono);font-size:8px;color:var(--text3);cursor:pointer;text-align:center;padding:8px;line-height:1.5}
+.dash-cover-placeholder:hover{border-color:var(--accent2)}
+.dash-cover-placeholder label:hover{color:var(--accent)}
+
+
+/* ── ERROR CONSOLE ───────────────────────────────────────────── */
+#err-console{font-family:var(--mono);font-size:9px;background:var(--bg0);border:1px solid var(--border2);
+  max-height:200px;overflow-y:auto;padding:2px 0;margin-top:8px;width:100%}
+.err-line{padding:3px 8px;border-bottom:1px solid var(--border);display:flex;gap:7px;align-items:baseline}
+.err-time{color:var(--text3);flex-shrink:0;font-size:8px}
+.err-type{flex-shrink:0;font-size:8px;padding:1px 4px;border-radius:2px}
+.err-type.e{background:rgba(252,129,129,.15);color:#fc8181}
+.err-type.w{background:rgba(246,173,85,.12);color:#f6ad55}
+.err-msg{color:var(--text2);word-break:break-all;flex:1;font-size:9px}
+.err-empty{padding:10px;color:var(--text3);text-align:center;font-size:9px}
+
+/* ── SETTINGS PANEL ────────────────────────────────────────────────── */
+#panel-settings{background:var(--bg0)}
+.set-topbar{padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg1);
+  flex-shrink:0;display:flex;align-items:center;gap:10px}
+.set-topbar-title{font-family:var(--mono);font-size:9px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--text3)}
+#settings-panel{flex:1;overflow-y:auto;width:100%;display:block}
+.set-page{max-width:680px;margin:0 auto;padding:18px 20px 60px}
+.set-group{background:var(--bg1);border:1px solid var(--border);margin-bottom:10px;overflow:hidden}
+.set-group-hdr{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--accent);
+  text-transform:uppercase;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.set-row{display:flex;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--border)}
+.set-row:last-child{border-bottom:none}
+.set-lbl{font-family:var(--mono);font-size:11px;color:var(--text2);flex:1;min-width:0;line-height:1.4}
+.set-lbl small{display:block;font-size:9px;color:var(--text3);margin-top:2px;font-weight:normal}
+.set-inp{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);padding:5px 8px;outline:none;width:80px}
+.set-inp:focus{border-color:var(--accent2)}
+.set-sel{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text);padding:5px 8px;outline:none;cursor:pointer}
+.set-btn{font-family:var(--mono);font-size:10px;background:none;border:1px solid var(--border2);
+  color:var(--text2);padding:5px 13px;cursor:pointer;letter-spacing:.06em;transition:all .12s;white-space:nowrap}
+.set-btn:hover{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
+.set-btn.danger:hover{color:#fc8181;border-color:#742a2a;background:rgba(252,129,129,.07)}
+.set-btn.primary{color:var(--accent);border-color:var(--accent2)}
+.set-swatch-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.set-swatch{width:22px;height:22px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0}
+.set-swatch:hover,.set-swatch.active{border-color:var(--text)}
+.set-preview{font-family:var(--font);font-size:13px;color:var(--text2);padding:10px 14px;
+  background:var(--bg2);border-top:1px solid var(--border);font-style:italic;line-height:1.6}
+.set-theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px 14px 14px}
+.set-theme-card{border:1px solid var(--border2);padding:9px 7px;cursor:pointer;transition:all .12s;text-align:center}
+.set-theme-card:hover{border-color:var(--accent2)}
+.set-theme-card.active{border-color:var(--accent);background:var(--accent-glow)}
+.set-theme-name{font-family:var(--mono);font-size:9px;color:var(--text2);margin-top:5px;letter-spacing:.06em}
+.set-theme-swatch{height:28px;margin-bottom:2px}
+
+/* ── KACHELN (Planning Tiles) ────────────────────────────────────── */
+.kacheln-layout{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.kacheln-toolbar{padding:8px 14px;border-bottom:1px solid var(--border);background:var(--bg1);display:flex;align-items:center;gap:10px;flex-shrink:0;flex-wrap:wrap}
+.kacheln-body{flex:1;overflow:auto;position:relative}
+.k-view-btn{font-family:var(--mono);font-size:9px;padding:3px 10px;border:1px solid var(--border2);background:none;color:var(--text3);cursor:pointer;letter-spacing:.08em;transition:all .12s}
+.k-view-btn.active{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
+.kacheln-table{min-width:600px;width:100%;border-collapse:collapse}
+.kacheln-table th{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;padding:6px 10px;background:var(--bg1);border:1px solid var(--border);position:sticky;top:0;z-index:2;white-space:nowrap}
+.kacheln-table th.beat-col{width:220px;min-width:180px;position:sticky;left:0;z-index:3;background:var(--bg1)}
+.kacheln-table td{border:1px solid var(--border);padding:4px;vertical-align:top;background:var(--bg0)}
+.kacheln-table td.beat-cell{background:var(--bg1);padding:8px 10px;width:220px;position:sticky;left:0;z-index:1}
+.kt-beat-name{font-family:var(--font);font-size:12px;font-style:italic;color:var(--text);margin-bottom:2px}
+.kt-beat-meta{font-family:var(--mono);font-size:9px;color:var(--text3)}
+.kt-beat-weight{display:inline-flex;align-items:center;gap:4px;margin-top:3px}
+.kt-weight-tag{font-family:var(--mono);font-size:8px;background:var(--bg3);border:1px solid var(--border2);padding:1px 5px;border-radius:2px;color:var(--accent)}
+.kt-range-tag{font-family:var(--mono);font-size:8px;color:var(--text3);padding:1px 5px;background:var(--bg2);border-radius:2px}
+.kt-pct-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:5px;overflow:hidden}
+.kt-pct-fill{height:100%;background:var(--accent);opacity:.4;border-radius:2px}
+.kacheln-cell{display:flex;flex-wrap:wrap;gap:4px;min-height:70px;padding:5px;cursor:pointer;transition:background .1s;align-content:flex-start}
+.kacheln-cell:hover{background:var(--accent-glow)}
+.kacheln-cell-add{font-size:20px;color:var(--text3);opacity:0;transition:opacity .15s;line-height:1;padding:2px 4px;flex-shrink:0;align-self:center;display:flex;align-items:center;justify-content:center;min-width:28px;min-height:28px}
+.kacheln-cell:hover .kacheln-cell-add{opacity:.5}
+.kachel-chip{display:inline-flex;flex-direction:column;gap:2px;background:var(--bg3);border:1px solid var(--border2);padding:4px 7px;border-radius:3px;cursor:pointer;max-width:180px;transition:all .12s;position:relative}
+.kachel-chip:hover{border-color:var(--accent2);background:var(--bg4)}
+.kachel-chip-title{font-family:var(--font);font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.kachel-chip-note{font-family:var(--mono);font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.kachel-chip.linked-scene{border-left-width:3px}
+.kachel-chip.has-date{box-shadow:inset 0 -2px 0 var(--sd)}
+.kachel-badges{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
+.kbadge{font-family:var(--mono);font-size:7px;padding:1px 3px;border-radius:2px;color:rgba(255,255,255,.7);white-space:nowrap}
+.kacheln-free-area{padding:14px}
+.kacheln-free-grid{display:flex;flex-wrap:wrap;gap:10px}
+.kacheln-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:120px;color:var(--text3);gap:8px}
+.kacheln-empty-icon{font-size:28px;opacity:.25}
+.kacheln-empty-text{font-family:var(--mono);font-size:10px;letter-spacing:.08em}
+.kachel-modal-title{font-family:var(--font);font-size:16px;font-style:italic;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.kachel-form{display:flex;flex-direction:column;gap:10px}
+.kf-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kf-group{display:flex;flex-direction:column;gap:3px}
+.kf-lbl{font-family:var(--mono);font-size:8px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase}
+.kf-inp{font-family:var(--font);font-size:12px;color:var(--text);background:var(--bg2);border:1px solid var(--border2);padding:5px 8px;outline:none;width:100%;transition:border-color .12s}
+.kf-inp:focus{border-color:var(--accent2)}
+.kf-ta{font-family:var(--font);font-size:12px;color:var(--text);background:var(--bg2);border:1px solid var(--border2);padding:5px 8px;outline:none;width:100%;resize:vertical;min-height:56px;transition:border-color .12s}
+.kf-ta:focus{border-color:var(--accent2)}
+.kf-sel{font-family:var(--mono);font-size:10px;color:var(--text);background:var(--bg2);border:1px solid var(--border2);padding:5px 8px;outline:none;width:100%}
+.kacheln-board-sel{display:flex;gap:4px;align-items:center}
+.kacheln-sel-lbl{font-family:var(--mono);font-size:9px;color:var(--text3)}
+.kacheln-board-sel select{font-family:var(--mono);font-size:10px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:3px 8px;outline:none}
+
+/* ── RELATIONSHIP GRAPH ─────────────────────────────────────────── */
+.rel-graph-container{padding:0 0 14px}
+.rel-graph-wrap{position:relative;background:var(--bg2);border:1px solid var(--border);overflow:hidden;touch-action:none}
+#rel-canvas{display:block;cursor:grab}
+#rel-canvas:active{cursor:grabbing}
+.rel-toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.rel-node-tooltip{position:fixed;pointer-events:none;background:var(--bg3);border:1px solid var(--border2);padding:5px 10px;font-family:var(--mono);font-size:10px;color:var(--text2);z-index:9999;display:none;border-radius:2px;max-width:220px;white-space:pre-wrap;line-height:1.4}
+.rel-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.rel-legend-item{display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:9px;color:var(--text3)}
+.rel-legend-dot{width:8px;height:8px;border-radius:50%}
+.rel-rel-list{display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto}
+.rel-rel-item{display:flex;align-items:center;gap:8px;padding:4px 8px;background:var(--bg2);border:1px solid var(--border);border-radius:2px}
+.rel-rel-tag{font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:2px;background:var(--bg3);color:var(--text3);flex-shrink:0}
+.rel-rel-label{font-family:var(--font);font-size:11px;color:var(--text2);flex:1}
+.rel-section-title{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.char-tabs-row{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:14px}
+.char-tab-btn{font-family:var(--mono);font-size:9px;padding:5px 12px;border:none;border-bottom:2px solid transparent;background:none;color:var(--text3);cursor:pointer;letter-spacing:.08em;text-transform:uppercase;transition:all .12s}
+.char-tab-btn:hover{color:var(--text2)}
+.char-tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* ── SCENE TEMPLATES ────────────────────────────────────────────── */
+.tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.tpl-card{border:1px solid var(--border2);background:var(--bg2);padding:10px 12px;cursor:pointer;transition:all .12s;border-radius:2px}
+.tpl-card:hover{border-color:var(--accent2);background:var(--bg3)}
+.tpl-card-name{font-family:var(--font);font-size:12px;color:var(--text);margin-bottom:2px}
+.tpl-card-func{font-family:var(--mono);font-size:8px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.tpl-card-desc{font-family:var(--mono);font-size:9px;color:var(--text3);margin-top:4px}
+
+/* ── POMODORO ────────────────────────────────────────────────────── */
+.pomo-wrap{display:flex;align-items:center;gap:0;border:1px solid var(--border2);overflow:hidden}
+.pomo-display{font-family:var(--mono);font-size:10px;color:var(--text3);padding:3px 10px;border:none;background:none;cursor:pointer;transition:all .12s;letter-spacing:.04em;white-space:nowrap}
+.pomo-display:hover{color:var(--accent);background:var(--accent-glow)}
+.pomo-display.work{color:var(--skt)!important;background:rgba(45,122,71,.12)!important}
+.pomo-display.rest{color:var(--sdt)!important;background:rgba(45,106,159,.1)!important}
+.pomo-display.urgent{animation:pomo-blink .7s step-end infinite;color:#fc8181!important;background:rgba(252,129,129,.1)!important}
+@keyframes pomo-blink{0%,100%{opacity:1}50%{opacity:.3}}
+.pomo-ctrl{font-family:var(--mono);font-size:10px;background:none;border:none;border-left:1px solid var(--border2);color:var(--text3);padding:3px 7px;cursor:pointer;transition:all .12s;line-height:1}
+.pomo-ctrl:hover{color:var(--accent);background:var(--accent-glow)}
+
+/* ── SPLIT VIEW ─────────────────────────────────────────────────── */
+.split-view-wrap{display:flex;height:100%;overflow:hidden}
+.split-pane{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0;border-right:1px solid var(--border)}
+.split-pane:last-child{border-right:none}
+.split-pane-hdr{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-bottom:8px;border-bottom:1px solid var(--border);background:var(--bg1)}
+.split-pane-sel{font-family:var(--mono);font-size:10px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);padding:4px 8px;flex:1;outline:none}
+.split-pane-title{font-family:var(--font);font-size:14px;font-style:italic;color:var(--text);padding-bottom:4px;border-bottom:1px dashed var(--border2)}
+.split-pane-text{font-family:var(--font);font-size:13px;color:var(--text2);line-height:1.75;white-space:pre-wrap}
+
+/* ── PLANNER AUTO-SCROLL ────────────────────────────────────────── */
+.pc-drag-scroll-top,.pc-drag-scroll-bot{position:absolute;left:0;right:0;height:50px;z-index:5;pointer-events:none}
+.pc-drag-scroll-top{top:0}
+.pc-drag-scroll-bot{bottom:0}
+
 </style>
 </head>
 <body>
@@ -1089,6 +1319,12 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
   </div>
   <div id="daily-badge">Heute: <span id="daily-count">0</span> Wörter</div>
   <div class="hdr-sep"></div>
+  <div class="pomo-wrap" title="Sprint-Timer: Klicken zum Starten">
+    <div class="pomo-display" id="pomo-display" onclick="Pomodoro.toggle()" title="▶ Klicken zum Starten / Pausieren">▶ 25:00</div>
+    <button class="pomo-ctrl" onclick="Pomodoro.reset()" title="Zurücksetzen">↺</button>
+    <button class="pomo-ctrl" onclick="Pomodoro.settings()" title="Sprint-Dauer einstellen">⚙</button>
+  </div>
+  <div class="hdr-sep" style="max-width:8px"></div>
   <button class="hbtn" onclick="App.exportProject()" title="Alle Projekte als JSON sichern">↓ JSON</button>
   <button class="hbtn" onclick="App.importProject()" title="JSON importieren">↑ JSON</button>
   <button class="hbtn" onclick="Help.open()" title="Hilfe (F1)">❓ Hilfe</button>
@@ -1121,9 +1357,9 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
     <button class="tab-btn" data-tab="calendar" onclick="App.switchTab('calendar',this)">Kalender</button>
     <button class="tab-btn" data-tab="book" onclick="App.switchTab('book',this)">Buch</button>
     <button class="tab-btn" data-tab="storyboard" onclick="App.switchTab('storyboard',this)">Storyboard</button>
+    <button class="tab-btn" data-tab="split" onclick="App.switchTab('split',this)">Split</button>
     <button class="tab-btn" data-tab="map" onclick="App.switchTab('map',this)">Weltkarte</button>
     <button class="tab-btn" data-tab="dashboard" onclick="App.switchTab('dashboard',this)">Dashboard</button>
-    <button class="tab-btn" data-tab="settings" onclick="App.switchTab('settings',this)" style="display:none">⚙</button>
   </div>
   <div id="tab-content">
 
@@ -1289,6 +1525,7 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
         <div id="char-list">
           <div class="sb-hdr">
             <span class="sb-title">Charaktere</span>
+            <button class="icon-btn" title="Beziehungsgraph" onclick="App.toggleRelGraph()" id="rel-graph-btn">◈</button>
             <button class="icon-btn" onclick="App.addCharacter()">+</button>
           </div>
           <div id="char-list-items"></div>
@@ -1296,6 +1533,22 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
         <div id="char-editor" style="display:none"></div>
         <div id="char-empty"><div class="ei" style="font-size:30px;opacity:.2">◈</div>
           <div class="et">Charakter auswählen</div></div>
+      </div>
+      <div id="rel-graph-panel" style="display:none;flex:1;flex-direction:column;overflow:hidden;padding:14px">
+        <div class="rel-toolbar">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;flex:1">Beziehungsgraph</span>
+          <button class="zoom-btn" onclick="RelGraph.addRelation()">+ Beziehung</button>
+          <button class="zoom-btn" onclick="RelGraph.autoLayout()">Auto-Layout</button>
+          <button class="zoom-btn" onclick="App.toggleRelGraph()">Schließen</button>
+        </div>
+        <div class="rel-graph-wrap" id="rel-graph-wrap" style="flex:1;min-height:300px">
+          <canvas id="rel-canvas"></canvas>
+          <div class="rel-node-tooltip" id="rel-tooltip"></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="rel-section-title">Beziehungen</div>
+          <div class="rel-rel-list" id="rel-rel-list"></div>
+        </div>
       </div>
     </div>
 
@@ -1335,8 +1588,11 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
     <div class="tab-panel" id="panel-beats">
       <div id="beats-panel" class="beats-wrap">
         <div class="beats-toolbar">
-          <button class="zoom-btn" onclick="Beats.addBeat()">＋ Beat</button>
-          <button class="zoom-btn" onclick="Beats.addPhase()">＋ Phase</button>
+          <button class="zoom-btn beats-vbtn active" id="beats-vbtn-kanban" onclick="Beats.setView('kanban')">☰ Kanban</button>
+          <button class="zoom-btn beats-vbtn" id="beats-vbtn-notizen" onclick="Beats.setView('notizen')">≡ Notizen</button>
+          <div style="width:1px;background:var(--border);height:16px;margin:0 2px;flex-shrink:0"></div>
+          <button class="zoom-btn" id="beats-btn-beat" onclick="Beats.addBeat()">＋ Beat</button>
+          <button class="zoom-btn" id="beats-btn-phase" onclick="Beats.addPhase()">＋ Phase</button>
           <button class="zoom-btn" onclick="Beats.renameActiveBoard()" title="Aktives Board umbenennen">✎ Board</button>
           <span style="flex:1"></span>
           <button class="zoom-btn" onclick="Beats.exportJSON()">↓ JSON</button>
@@ -1344,26 +1600,40 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
         </div>
         <div class="beats-boards-bar" id="beats-boards-bar"><!-- rendered by JS --></div>
 
-        <div class="beats-sub">
-          <div class="beats-hint">
-            Plane die großen Story-Beats (Plotpunkte) unabhängig von Szenen. Du kannst Beats per Drag & Drop umsortieren und optional mit einer Szene verlinken.
-            <span class="help-chip">Tipp:</span> Klick auf einen Beat, um Details zu bearbeiten.
+        <!-- Kanban view -->
+        <div id="beats-view-kanban" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+          <div class="beats-sub">
+            <div class="beats-hint">
+              Plane die großen Story-Beats (Plotpunkte) unabhängig von Szenen. Du kannst Beats per Drag &amp; Drop umsortieren und optional mit einer Szene verlinken.
+              <span class="help-chip">Tipp:</span> Klick auf einen Beat, um Details zu bearbeiten.
+            </div>
           </div>
+          <div class="beats-methods">
+            <div class="beats-methods-head">
+              <div class="beats-methods-title">Planungsmethoden (Übersicht)</div>
+              <button class="zoom-btn" id="beats-methods-toggle" onclick="Beats.toggleMethods()">Ausblenden</button>
+            </div>
+            <div class="beats-methods-grid" id="beats-methods-grid"></div>
+            <div class="beats-methods-foot">
+              <span class="help-chip">Hinweis:</span>
+              Klick auf eine Karte = Vorschau. „＋ Als Board hinzufügen" fügt die Methode als eigenes Board hinzu.
+            </div>
+          </div>
+          <div id="beats-grid" class="beats-grid"></div>
         </div>
 
-        <div class="beats-methods">
-          <div class="beats-methods-head">
-            <div class="beats-methods-title">Planungsmethoden (Übersicht)</div>
-            <button class="zoom-btn" id="beats-methods-toggle" onclick="Beats.toggleMethods()">Ausblenden</button>
+        <!-- Notizen view -->
+        <div id="beats-view-notizen" style="flex:1;display:none;flex-direction:column;overflow:hidden">
+          <div class="beats-notiz-bar">
+            <span class="beats-notiz-label">Beat-Notizen</span>
+            <span id="bn-count" class="beats-notiz-label" style="color:var(--text3)"></span>
+            <span id="bn-beat-count" class="beats-notiz-label" style="color:var(--text3);margin-left:4px"></span>
+            <span style="flex:1"></span>
+            <button class="zoom-btn" id="beats-strand-btn" onclick="BeatNotizen.toggleStrandCols()" title="Notizen nach Strängen in Spalten anordnen">⇆ Stränge</button>
+            <button class="zoom-btn" onclick="BeatNotizen.addKachel(null)">＋ Freie Idee</button>
           </div>
-          <div class="beats-methods-grid" id="beats-methods-grid"></div>
-          <div class="beats-methods-foot">
-            <span class="help-chip">Hinweis:</span>
-            Klick auf eine Karte = Vorschau. „＋ Als Board hinzufügen" fügt die Methode als eigenes Board hinzu.
-          </div>
+          <div id="bn-view" class="bn-view-scroll"></div>
         </div>
-
-        <div id="beats-grid" class="beats-grid"></div>
 
         <!-- Beat editor modal reuse -->
         <div id="beats-modal" class="beats-modal">
@@ -1405,6 +1675,51 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
   <div class="bpm-box" id="bpm-box"></div>
 </div>
 
+<!-- KACHELN PANEL -->
+    <div class="tab-panel" id="panel-kacheln">
+      <div class="kacheln-layout">
+        <div class="kacheln-toolbar">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase">Planungskacheln</span>
+          <div class="kacheln-board-sel">
+            <span class="kacheln-sel-lbl">Beat-Board:</span>
+            <select id="kacheln-board-sel" onchange="Kacheln.setBoard(this.value)"></select>
+          </div>
+          <div style="display:flex;gap:3px">
+            <button class="k-view-btn active" id="kv-beats" onclick="Kacheln.setView('beats',this)">Beats × Stränge</button>
+            <button class="k-view-btn" id="kv-free" onclick="Kacheln.setView('free',this)">Alle Kacheln</button>
+          </div>
+          <button class="zoom-btn" onclick="Kacheln.addKachel(null,null)" title="Neue Kachel ohne Beat">+ Kachel</button>
+          <span style="flex:1"></span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)" id="kacheln-count"></span>
+        </div>
+        <div class="kacheln-body" id="kacheln-body"></div>
+      </div>
+    </div>
+
+<!-- SPLIT VIEW PANEL -->
+    <div class="tab-panel" id="panel-split">
+      <div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+        <div style="padding:6px 14px;border-bottom:1px solid var(--border);background:var(--bg1);flex-shrink:0;display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase">Split-Ansicht</span>
+          <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">Zwei Szenen parallel vergleichen</span>
+        </div>
+        <div class="split-view-wrap" id="split-view-wrap">
+          <div class="split-pane" id="split-left">
+            <div class="split-pane-hdr">
+              <select class="split-pane-sel" onchange="SplitView.load('left',this.value)" id="split-sel-left"></select>
+            </div>
+            <div id="split-content-left" style="flex:1"></div>
+          </div>
+          <div class="split-pane" id="split-right">
+            <div class="split-pane-hdr">
+              <select class="split-pane-sel" onchange="SplitView.load('right',this.value)" id="split-sel-right"></select>
+            </div>
+            <div id="split-content-right" style="flex:1"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
 <!-- GRID LINK MODAL -->
 <div class="gp-link-modal" id="gp-link-modal">
   <div class="gp-link-box">
@@ -1426,9 +1741,10 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
         <div class="gp-topbar">
           <div class="gp-topbar-section">
             <span class="gp-label">Von</span>
-            <input type="date" class="gp-date-inp" id="gp-start" onchange="GridPlan.onRangeChange()">
+            <input type="date" class="gp-date-inp" id="gp-start" onkeydown="if(event.key==='Enter')GridPlan.applyRange()">
             <span class="gp-label">Bis</span>
-            <input type="date" class="gp-date-inp" id="gp-end" onchange="GridPlan.onRangeChange()">
+            <input type="date" class="gp-date-inp" id="gp-end" onkeydown="if(event.key==='Enter')GridPlan.applyRange()">
+            <button class="zoom-btn" id="gp-apply-btn" onclick="GridPlan.applyRange()" title="Datumsbereich anwenden">✓ Anwenden</button>
           </div>
           <div class="gp-topbar-section">
             <button class="gp-mode-btn active" id="gp-mode-date" onclick="GridPlan.setMode('date',this)">📅 Datum</button>
@@ -1537,7 +1853,10 @@ input[type=date].fi{font-size:11px;padding:5px 8px;font-family:var(--mono);curso
     </div>
 
     <div class="tab-panel" id="panel-settings">
-      <div id="settings-panel" style="max-width:680px;margin:0 auto;padding:24px 20px;overflow-y:auto;height:100%"></div>
+      <div class="set-topbar">
+        <span class="set-topbar-title">Einstellungen</span>
+      </div>
+      <div id="settings-panel"></div>
     </div>
 
   </div>
@@ -1976,6 +2295,7 @@ function defaultState() {
   return {
     volumes: [], characters: [], locations: [], strands: [],
     planner: { cards: [], order: {} },
+    kacheln: [],
     activeSceneId: null, activeCharId: null, activeLocId: null,
     ui: {
       expandedVolumes:{}, expandedChapters:{},
@@ -1983,7 +2303,9 @@ function defaultState() {
       dailyGoal: 500, dailyDate: '', dailyBase: 0,
       calColor: 'strand',
       plannerView: 'columns',
-      navShowDates: false
+      navShowDates: false,
+      kachelnView: 'beats',
+      kachelnBoardId: null
     },
     storyboard: {}
   };
@@ -3579,7 +3901,9 @@ function renderMonthOverview(targetId='tl-month-area') {
 function renderCalendarFull() {
   const area = document.getElementById('calendar-main-area');
   if (!area) return;
-  if (state.ui.activeTab !== 'calendar' && state.ui.activeTab !== undefined) return;
+  // Only skip if panel is not visible in DOM (display:none)
+  const panel = document.getElementById('panel-calendar');
+  if (panel && !panel.classList.contains('active') && state.ui && state.ui.activeTab !== 'calendar') return;
 
   const strands = getStrands();
   const today = new Date();
@@ -4063,7 +4387,8 @@ const App = {
     if (btn) btn.classList.add('active');
     const tabMap={scene:'panel-scene',cork:'panel-cork',search:'panel-search',
       chars:'panel-chars',locs:'panel-locs',planner:'panel-planner',beats:'panel-beats',calendar:'panel-calendar',book:'panel-book',
-      storyboard:'panel-storyboard',map:'panel-map',dashboard:'panel-dashboard',grid:'panel-grid',settings:'panel-settings'};
+      storyboard:'panel-storyboard',map:'panel-map',dashboard:'panel-dashboard',grid:'panel-grid',settings:'panel-settings',
+      kacheln:'panel-beats',split:'panel-split'};
     const p=document.getElementById(tabMap[tab]);
     if (p) p.classList.add('active');
     state.ui.activeTab=tab; saveState();
@@ -4080,6 +4405,8 @@ const App = {
     if (tab==='book') { renderBookView(); }
     if (tab==='storyboard') { renderStoryboard(); }
     if (tab==='settings') { renderSettings(); }
+    if (tab==='kacheln') { try{ Beats.setView('notizen'); }catch(_){} }
+    if (tab==='split') { try{ SplitView.init(); }catch(_){} }
   },
 
   toggleNavDates(btn) {
@@ -4637,17 +4964,42 @@ const App = {
 
   // ── SCENE CRUD ───────────────────────────────────────────────
   addScene(chId) {
+    const TEMPLATES = SceneTemplates.list();
+    const tplHtml = TEMPLATES.map(t =>
+      `<div class="tpl-card" onclick="App._selectTpl('${chId}','${t.id}',this)" data-tpl="${t.id}">
+        <div class="tpl-card-name">${esc(t.name)}</div>
+        <div class="tpl-card-func">${esc(t.func)}</div>
+        <div class="tpl-card-desc">${esc(t.desc)}</div>
+      </div>`).join('');
     showModal(`<div class="modal-title">Neue Szene</div>
       <label class="modal-lbl">Titel</label>
       <input class="modal-inp" id="m0" placeholder="Szene 1: …">
+      <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin:10px 0 6px">Vorlage (optional)</div>
+      <div class="tpl-grid">${tplHtml}<div class="tpl-card" onclick="App._selectTpl('${chId}','blank',this)" data-tpl="blank"><div class="tpl-card-name">Freie Szene</div><div class="tpl-card-func">LEER</div><div class="tpl-card-desc">Keine Vorlage</div></div></div>
       <div class="modal-btns"><button class="mbtn" onclick="closeModal()">Abbrechen</button>
       <button class="mbtn primary" onclick="App._doAddSc('${chId}')">Erstellen</button></div>`,
-      b=>b.querySelector('#m0').focus());
+      b=>{ b.querySelector('#m0').focus(); App._activeTpl=null; });
+  },
+  _activeTpl: null,
+  _selectTpl(chId, tplId, el) {
+    document.querySelectorAll('.tpl-card').forEach(c=>c.style.borderColor='');
+    if (el) el.style.borderColor='var(--accent)';
+    App._activeTpl = tplId;
   },
   _doAddSc(chId) {
     const f=findChapter(chId); if (!f) return;
     const t=document.getElementById('m0').value.trim()||'Szene';
-    const sc=newScene(t); f.ch.scenes.push(sc);
+    const sc=newScene(t);
+    if (App._activeTpl && App._activeTpl !== 'blank') {
+      const tpl = SceneTemplates.get(App._activeTpl);
+      if (tpl) {
+        if (tpl.summary) sc.summary = tpl.summary;
+        if (tpl.notes) sc.notes = tpl.notes;
+        if (tpl.status) sc.status = tpl.status;
+      }
+    }
+    App._activeTpl = null;
+    f.ch.scenes.push(sc);
     state.activeSceneId=sc.id;
     saveState(); closeModal(); render();
     toast('Szene erstellt: '+t,'ok');
@@ -4709,6 +5061,24 @@ const App = {
 
   selectChar(id) { state.activeCharId=id; saveState(); renderCharTab(); },
 
+  toggleRelGraph() {
+    const charPanel = document.getElementById('char-panel');
+    const relPanel = document.getElementById('rel-graph-panel');
+    const btn = document.getElementById('rel-graph-btn');
+    if (!charPanel || !relPanel) return;
+    const showing = relPanel.style.display !== 'none';
+    if (showing) {
+      relPanel.style.display = 'none';
+      charPanel.style.display = '';
+      if (btn) btn.style.color = '';
+    } else {
+      charPanel.style.display = 'none';
+      relPanel.style.display = 'flex';
+      if (btn) btn.style.color = 'var(--accent)';
+      try { RelGraph.init(); } catch(_) {}
+    }
+  },
+
   saveCharF(key, val) {
     const c=state.characters.find(x=>x.id===state.activeCharId); if (!c) return;
     c[key]=val; saveState();
@@ -4736,7 +5106,7 @@ const App = {
     toast('Orte exportiert (' + (state.locations||[]).length + ')', 'ok');
   },
 
-  async exportProject() {
+  async exportProject(returnOnly = false) {
     await saveStateNow();
     const projects = (() => { try { return JSON.parse(localStorage.getItem('skriptorium.projects')||'[]'); } catch(_){ return []; } })();
     const activeId = _activeProjectId();
@@ -4757,7 +5127,9 @@ const App = {
     try { snapshot._grid  = JSON.parse(localStorage.getItem(lsKeyGrid())||'null');  } catch(_){}
     try { snapshot._spotify = JSON.parse(localStorage.getItem(lsKeySpotify())||'null'); } catch(_){}
     Object.assign(snapshot, { _skriptoriumExport:true, _version:3, _exportedAt:new Date().toISOString(), _activeProjectId:activeId, _projectList:projects, _allProjects:allProjects });
-    download('skriptorium-export.json', JSON.stringify(snapshot,null,2));
+    const jsonStr = JSON.stringify(snapshot, null, 2);
+    if (returnOnly) return jsonStr;
+    download('skriptorium-export.json', jsonStr);
     toast('Export: '+allProjects.length+' Projekt(e) gesichert','ok');
   },
   exportHTML() {
@@ -5411,7 +5783,7 @@ function makePlannerCard(card, strandColor, hasDateWarn) {
   const sc = card.sceneId ? findScene(card.sceneId) : null;
   const statusColors = { idea:'var(--si)', draft:'var(--sd)', revise:'var(--sr)', done:'var(--sk)' };
   const el = document.createElement('div');
-  el.className = 'planner-card';
+  el.className = card._kachel ? 'planner-card _kachel-card' : 'planner-card';
   el.dataset.cardId = card.id;
   el.style.borderLeftColor = strandColor;
 
@@ -5436,11 +5808,12 @@ function makePlannerCard(card, strandColor, hasDateWarn) {
       <div class="pc-title" ondblclick="plannerEditTitle(this,'${card.id}')">${esc(card.title)}</div>
     </div>
     ${dateHtml}
-    ${card.note ? `<div class="pc-note" ondblclick="plannerEditNote(this,'${card.id}')">${esc(card.note)}</div>` : `<div class="pc-note" style="color:var(--text3);font-style:italic;cursor:pointer" ondblclick="plannerEditNote(this,'${card.id}')">Notiz hinzufügen…</div>`}
+    ${(card.note||card.notes) ? `<div class="pc-note" ondblclick="plannerEditNote(this,'${card.id}')">${esc(card.note||card.notes)}</div>` : `<div class="pc-note" style="color:var(--text3);font-style:italic;cursor:pointer" ondblclick="plannerEditNote(this,'${card.id}')">Notiz hinzufügen…</div>`}
     <div class="pc-footer">
-      ${sc ? `<div class="pc-scene-link" onclick="App.jumpToScene('${sc.sc.id}')" title="${esc(sc.sc.title)}">↗ ${esc(sc.sc.title)}</div>` : `<div class="pc-scene-link" style="cursor:default;color:var(--text3)">Ideen-Karte</div>`}
+      ${card._kachel ? `<div class="pc-scene-link" style="cursor:default;color:var(--accent);opacity:.7">◈ Beat-Notiz</div>` : sc ? `<div class="pc-scene-link" onclick="App.jumpToScene('${sc.sc.id}')" title="${esc(sc.sc.title)}">↗ ${esc(sc.sc.title)}</div>` : `<div class="pc-scene-link" style="cursor:default;color:var(--text3)">Ideen-Karte</div>`}
       <div class="pc-actions">
         <button class="pc-btn" onclick="plannerSetDate('${card.id}')" title="Datum setzen">📅</button>
+        <button class="pc-btn" onclick="plannerMoveToPos('${card.id}','${card.strandId||'none'}')" title="An Position verschieben">⇅</button>
         <button class="pc-btn" onclick="plannerCycleStatus('${card.id}')" title="Status">${(card.status||'idea').slice(0,1).toUpperCase()}</button>
         <button class="pc-btn" onclick="plannerLinkScene('${card.id}')" title="Szene verknüpfen">↗</button>
         ${!sc ? `<button class="pc-btn" onclick="plannerToScene('${card.id}')" title="Als Szene anlegen">+S</button>` : ''}
@@ -5606,6 +5979,30 @@ function plannerDeleteCard(cardId) {
   saveState(); renderPlanner();
 }
 
+function plannerMoveToPos(cardId, strandId) {
+  const order = state.planner.order[strandId] || [];
+  const cards = order.map(id => state.planner.cards.find(c=>c.id===id)).filter(Boolean);
+  if (cards.length <= 1) { toast('Nur eine Karte in diesem Strang.','err'); return; }
+  const currentIdx = order.indexOf(cardId);
+  let opts = cards.map((c,i) => `<div class="meta-dd-item${i===currentIdx?' active':''}" style="${i===currentIdx?'color:var(--accent)':''}" onmousedown="event.preventDefault();plannerDoMoveToPos('${cardId}','${strandId}',${i})">${i+1}. ${esc(c.title||'Karte')}</div>`).join('');
+  showModal(`<div class="modal-title">Karte verschieben — Position wählen</div>
+    <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:8px">Aktuell: Position ${currentIdx+1} von ${cards.length}</div>
+    <div style="max-height:300px;overflow-y:auto;border:1px solid var(--border)">${opts}</div>
+    <div class="modal-btns"><button class="mbtn" onclick="closeModal()">Schließen</button></div>`);
+}
+
+function plannerDoMoveToPos(cardId, strandId, newIdx) {
+  const order = state.planner.order[strandId];
+  if (!order) return;
+  const oldIdx = order.indexOf(cardId);
+  if (oldIdx < 0) return;
+  order.splice(oldIdx, 1);
+  order.splice(newIdx, 0, cardId);
+  plannerDistribute(strandId);
+  saveState(); closeModal(); renderPlanner();
+  toast('Karte verschoben auf Position '+(newIdx+1),'ok');
+}
+
 function plannerBuildLinkList(cardId, filter) {
   const sC = {idea:'var(--si)',draft:'var(--sd)',revise:'var(--sr)',done:'var(--sk)'};
   const sL = {idea:'I',draft:'E',revise:'R',done:'F'};
@@ -5724,11 +6121,29 @@ function plannerCreateScene(cardId) {
 const PlannerDnD = (() => {
   let drag = null;
   let lastPos = null;
+  let _scrollTimer = null;
 
   function clearStyles() {
     document.querySelectorAll('.pc-dragging,.pc-drop-top,.pc-drop-bottom,.pc-col-over')
       .forEach(el => el.classList.remove('pc-dragging','pc-drop-top','pc-drop-bottom','pc-col-over'));
   }
+
+  // Auto-scroll the planner-cards container during drag
+  function handleAutoScroll(e) {
+    if (!drag) return;
+    const containers = document.querySelectorAll('.planner-cards');
+    containers.forEach(area => {
+      const r = area.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right) return;
+      const ZONE = 60;
+      if (e.clientY < r.top + ZONE && e.clientY > r.top - 20) {
+        area.scrollTop -= 8;
+      } else if (e.clientY > r.bottom - ZONE && e.clientY < r.bottom + 20) {
+        area.scrollTop += 8;
+      }
+    });
+  }
+  document.addEventListener('dragover', handleAutoScroll);
 
   function bindCard(el, cardId, strandId) {
     el.draggable = true;
@@ -6480,73 +6895,6 @@ function buildHTMLExport() {
   .s-done{background:#d8f5e4;color:#2d7a47}
   @media print{h1{page-break-before:always}h1:first-of-type{page-break-before:avoid}}
 
-/* ── Month Overview: alias classes + better readability ───────────────── */
-.mo-legend-item{display:flex;align-items:center;gap:6px;color:var(--text2);font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.015)}
-.mo-legend-dot{width:10px;height:10px;border-radius:999px;border:1px solid var(--border);box-shadow:0 0 0 2px rgba(0,0,0,.15) inset}
-.mo-cell{border:1px solid var(--border);border-radius:12px;min-height:120px;padding:8px;display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.012)}
-.mo-cell.blank{border:0;background:transparent;min-height:0}
-.mo-cell.today{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(255,255,255,.03) inset}
-.mo-item-bar{width:6px;align-self:stretch;border-radius:6px;flex:0 0 auto;opacity:.95}
-.mo-item{background:rgba(0,0,0,.08)}
-/* Big calendar panel tweaks */
-.bigcal-wrap{max-width:1100px;margin:0 auto}
-.bigcal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-.bigcal-title{font-size:18px;font-weight:750;letter-spacing:.01em;line-height:1.15}
-.bigcal-sub{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:4px}
-.bigcal-legend{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin:10px 0 14px}
-.bigcal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
-.bigcal-grid .mo-dow{padding:6px 0}
-
-
-/* ── DASHBOARD COVER ─────────────────────────────────────────── */
-.dash-cover-hero{display:flex;gap:14px;padding:14px 16px;background:var(--bg1);border-bottom:1px solid var(--border)}
-.dash-cover-hero.dash-cover-empty{align-items:center}
-.dash-cover-img{width:72px;height:108px;object-fit:cover;border-radius:3px;box-shadow:0 3px 12px rgba(0,0,0,.5);flex-shrink:0;border:1px solid var(--border2)}
-.dash-cover-meta{flex:1;display:flex;flex-direction:column;gap:5px;justify-content:flex-end;min-width:0}
-.dash-cover-title{font-family:var(--font);font-size:14px;font-style:italic;color:var(--text);line-height:1.2}
-.dash-cover-sub{font-family:var(--mono);font-size:9px;color:var(--text3)}
-.dash-cover-bar{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
-.dash-cover-fill{height:100%;background:var(--accent);border-radius:2px}
-.dash-cover-change{font-family:var(--mono);font-size:9px;color:var(--text3);cursor:pointer;display:inline-block}
-.dash-cover-change:hover{color:var(--accent)}
-.dash-cover-placeholder{width:72px;height:108px;border:1px dashed var(--border2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.dash-cover-placeholder label{font-family:var(--mono);font-size:8px;color:var(--text3);cursor:pointer;text-align:center;padding:8px;line-height:1.5}
-.dash-cover-placeholder:hover{border-color:var(--accent2)}
-.dash-cover-placeholder label:hover{color:var(--accent)}
-
-/* ── SETTINGS PANEL ──────────────────────────────────────────── */
-.set-section{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--text3);padding:14px 0 6px;border-bottom:1px solid var(--border);margin-bottom:10px}
-.set-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
-.set-row:last-child{border-bottom:none}
-.set-lbl{font-family:var(--mono);font-size:10px;color:var(--text2);flex:1;min-width:0}
-.set-lbl small{display:block;font-size:9px;color:var(--text3);margin-top:1px}
-.set-inp{font-family:var(--mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);
-  color:var(--text);padding:4px 8px;outline:none;width:90px}
-.set-inp:focus{border-color:var(--accent2)}
-.set-sel{font-family:var(--mono);font-size:10px;background:var(--bg3);border:1px solid var(--border2);
-  color:var(--text);padding:3px 6px;outline:none;cursor:pointer}
-.set-btn{font-family:var(--mono);font-size:10px;background:none;border:1px solid var(--border2);
-  color:var(--text3);padding:4px 10px;cursor:pointer;transition:all .15s;letter-spacing:.04em}
-.set-btn:hover{color:var(--accent);border-color:var(--accent2);background:var(--accent-glow)}
-.set-btn.danger:hover{color:#fc8181;border-color:#742a2a}
-.set-btn.primary{color:var(--accent);border-color:var(--accent2)}
-.set-swatch-row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.set-swatch{width:20px;height:20px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:all .12s;flex-shrink:0}
-.set-swatch:hover,.set-swatch.active{border-color:var(--text)}
-.set-preview{font-family:var(--font);font-size:13px;color:var(--text);background:var(--bg2);
-  border:1px solid var(--border);padding:10px 12px;border-radius:2px;line-height:1.6;margin-top:8px;font-style:italic}
-
-/* ── ERROR CONSOLE ───────────────────────────────────────────── */
-#err-console{font-family:var(--mono);font-size:9px;background:var(--bg0);border:1px solid var(--border2);
-  max-height:200px;overflow-y:auto;padding:2px 0;margin-top:8px;width:100%}
-.err-line{padding:3px 8px;border-bottom:1px solid var(--border);display:flex;gap:7px;align-items:baseline}
-.err-time{color:var(--text3);flex-shrink:0;font-size:8px}
-.err-type{flex-shrink:0;font-size:8px;padding:1px 4px;border-radius:2px}
-.err-type.e{background:rgba(252,129,129,.15);color:#fc8181}
-.err-type.w{background:rgba(246,173,85,.12);color:#f6ad55}
-.err-msg{color:var(--text2);word-break:break-all;flex:1;font-size:9px}
-.err-empty{padding:10px;color:var(--text3);text-align:center;font-size:9px}
 </style></head><body>
 `;
 
@@ -6738,11 +7086,46 @@ document.addEventListener('click',e=>{
 });
 
 // ════════════════════════════════════════════════════════════════
+//  MIGRATE: old state.kacheln[] → state.planner.cards[]
+// ════════════════════════════════════════════════════════════════
+function _migrateKacheln() {
+  if (!state.kacheln || !state.kacheln.length) return;
+  if (!state.planner) state.planner = { cards:[], order:{} };
+  if (!state.planner.cards) state.planner.cards = [];
+  if (!state.planner.order) state.planner.order = {};
+  const existing = new Set(state.planner.cards.map(c=>c._srcKachelId).filter(Boolean));
+  state.kacheln.forEach(k => {
+    if (existing.has(k.id)) return;
+    const newId = 'card_' + k.id;
+    const sid = k.strandId || 'none';
+    state.planner.cards.push({
+      id: newId,
+      _kachel: true,
+      _srcKachelId: k.id,
+      title: k.titel || '',
+      note: k.notiz || '',
+      beatId: k.beatId || null,
+      strandId: sid,
+      ort: k.ort || '',
+      date: k.datum || '',
+      dateManual: !!k.datum,
+      sceneId: k.sceneId || null,
+      status: 'idea',
+    });
+    if (!state.planner.order[sid]) state.planner.order[sid] = [];
+    if (!state.planner.order[sid].includes(newId)) state.planner.order[sid].push(newId);
+  });
+  state.kacheln = [];
+  saveState();
+}
+
+// ════════════════════════════════════════════════════════════════
 //  INIT
 // ════════════════════════════════════════════════════════════════
 async function init(){
   try { await DB.open(); } catch(e){ toast('IndexedDB-Fehler: '+e.message,'err'); }
   await loadState();
+  _migrateKacheln();
   AC.init();
 
   // Restore active tab
@@ -6789,6 +7172,7 @@ async function init(){
     if (state.ui.activeTab === 'book') safeRun(renderBookView, 'renderBookView-init2');
     if (state.ui.activeTab === 'calendar') safeRun(renderCalendarFull, 'renderCalendarFull-init2');
   });
+  AutoBackup.init();
 }
 
 
@@ -6933,7 +7317,27 @@ const Beats = (() => {
     save(); renderBoardTabs(); render();
     toast('Board erstellt: ' + label, 'ok');
   }
-  function switchBoard(id) { bState.activeBoardId = id; save(); renderBoardTabs(); render(); }
+  function switchBoard(id) { bState.activeBoardId = id; save(); renderBoardTabs(); render(); try{BeatNotizen.render();}catch(_){} }
+
+  /* ── VIEW TOGGLE ─────────────────────────────────────────────── */
+  let _beatsView = 'kanban';
+  function setView(v) {
+    _beatsView = v;
+    const kv = document.getElementById('beats-view-kanban');
+    const nv = document.getElementById('beats-view-notizen');
+    const kb = document.getElementById('beats-vbtn-kanban');
+    const nb = document.getElementById('beats-vbtn-notizen');
+    const bb = document.getElementById('beats-btn-beat');
+    const pb = document.getElementById('beats-btn-phase');
+    if (kv) kv.style.display = v==='kanban' ? 'flex' : 'none';
+    if (nv) nv.style.display = v==='notizen' ? 'flex' : 'none';
+    [kb,nb].forEach(b=>{ if(b){b.classList.remove('active'); b.style.color=''; b.style.borderColor=''; }});
+    const active = v==='kanban'?kb:nb;
+    if(active){active.classList.add('active'); active.style.color='var(--accent)'; active.style.borderColor='var(--accent2)';}
+    if(bb) bb.style.display = v==='kanban'?'':'none';
+    if(pb) pb.style.display = v==='kanban'?'':'none';
+    if (v==='notizen') try{BeatNotizen.render();}catch(_){}
+  }
   function deleteBoard(id) {
     if (bState.boards.length <= 1) { toast('Mindestens ein Board muss bleiben.','err'); return; }
     if (!confirm('Board löschen?')) return;
@@ -7119,15 +7523,43 @@ const Beats = (() => {
       });
     }
 
+    // Planner card chips
+    const allCardIds = _beatCardIds(b);
+    if (allCardIds.length) {
+      const planCards = getPlannerCards();
+      allCardIds.forEach(cid => {
+        const card = planCards.find(c=>c.id===cid);
+        const link = document.createElement('span');
+        link.className = 'beat-chip card-link';
+        link.textContent = '⊡ ' + (card ? (card.title||'Block') : 'Block');
+        link.title = 'Planer-Block – Klicken zum Verwalten';
+        link.addEventListener('click', e => { e.stopPropagation(); openBeatScenePicker(b.id); });
+        meta.appendChild(link);
+      });
+    }
+
     // Add-scene button
     const addScBtn = document.createElement('button');
     addScBtn.className = 'beat-sc-add';
-    addScBtn.textContent = '＋ Szene';
-    addScBtn.title = 'Szene hinzufügen oder verknüpfen';
+    addScBtn.textContent = '＋ Verknüpfen';
+    addScBtn.title = 'Szene oder Planer-Block verknüpfen';
     addScBtn.addEventListener('click', e => { e.stopPropagation(); openBeatScenePicker(b.id); });
     meta.appendChild(addScBtn);
 
-    c.appendChild(t); c.appendChild(n); c.appendChild(meta);
+    // Progress bar (word count of linked scenes vs. book goal)
+    const prog = _beatProgress(b);
+    if (prog !== null) {
+      const pb = document.createElement('div');
+      pb.className = 'beat-progress';
+      pb.title = prog.words + ' Wörter · ' + prog.pct + '% des Buchziels';
+      pb.innerHTML = `<div class="beat-progress-fill" style="width:${prog.pct}%"></div>`;
+      const pl = document.createElement('div');
+      pl.className = 'beat-progress-lbl';
+      pl.textContent = prog.pct + '%';
+      c.appendChild(t); c.appendChild(n); c.appendChild(meta); c.appendChild(pb); c.appendChild(pl);
+    } else {
+      c.appendChild(t); c.appendChild(n); c.appendChild(meta);
+    }
     c.addEventListener('click', () => openEditor(b.id));
 
     c.addEventListener('dragstart', (ev) => {
@@ -7147,36 +7579,71 @@ const Beats = (() => {
     return ids;
   }
 
-  // Open a picker modal to manage scenes for a beat
+  function _beatCardIds(b) { return Array.isArray(b.cardIds) ? [...b.cardIds] : []; }
+  function getPlannerCards() { try { return (state.planner && state.planner.cards) ? state.planner.cards : []; } catch(_) { return []; } }
+
+  function _beatProgress(b) {
+    const scIds = _beatSceneIds(b);
+    if (!scIds.length) return null;
+    const scenes = getScenes();
+    const beatWords = scIds.reduce((sum, sid) => {
+      const sc = scenes.find(s=>s.id===sid);
+      return sum + countWords(sc ? (sc.text||'') : '');
+    }, 0);
+    const ws = SettingsState.get().wordGoal || 0;
+    const goal = ws > 0 ? ws : getAllScenes().reduce((a,{sc})=>a+countWords(sc.text||''),0);
+    return goal > 0 ? { pct: Math.min(100, Math.round(beatWords/goal*100)), words: beatWords } : null;
+  }
+
+  // Open a picker modal to manage scenes + planner cards for a beat
   function openBeatScenePicker(beatId) {
     const m = getModel();
     const b = m.beats.find(x=>x.id===beatId); if (!b) return;
     const linked = _beatSceneIds(b);
+    const linkedCards = _beatCardIds(b);
     const allSc = getScenes();
+    const allCards = getPlannerCards();
+    const noSc = '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0">Keine Szenen verknüpft.</div>';
+    const noCard = '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0">Keine Planer-Blöcke verknüpft.</div>';
 
-    const rows = linked.map(sid => {
+    const scRows = linked.map(sid => {
       const sc = allSc.find(s=>s.id===sid);
       const st = sc ? (sc.status||'idea') : '';
       const stLabel = {idea:'Idee',draft:'Entwurf',revise:'Revise',done:'Fertig'}[st]||st;
       return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
         <span style="font-family:var(--font);font-size:12px;flex:1">${esc(sc?sc.title:'Unbekannte Szene')}</span>
         <span style="font-family:var(--mono);font-size:9px;color:var(--text3)">${stLabel}</span>
-        <button class="mbtn" style="font-size:10px" onclick="Beats._unlinkScene('${beatId}','${sid}');closeModal()">✕</button>
+        <button class="mbtn" style="font-size:10px" onclick="Beats._unlinkScene('${beatId}','${sid}');Beats.openBeatScenePicker('${beatId}')">✕</button>
       </div>`;
     }).join('');
 
-    const opts = allSc.filter(s=>!linked.includes(s.id)).map(s =>
-      `<option value="${s.id}">${esc(s.title||'Szene')}</option>`).join('');
+    const cardRows = linkedCards.map(cid => {
+      const card = allCards.find(c=>c.id===cid);
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--mono);font-size:10px;color:var(--accent);flex-shrink:0">⊡</span>
+        <span style="font-family:var(--font);font-size:12px;flex:1">${esc(card?card.title:'Unbekannter Block')}</span>
+        <button class="mbtn" style="font-size:10px" onclick="Beats._unlinkCard('${beatId}','${cid}');Beats.openBeatScenePicker('${beatId}')">✕</button>
+      </div>`;
+    }).join('');
 
-    showModal(`<div class="modal-title">Szenen für Beat: ${esc(b.title||'—')}</div>
-      ${rows || '<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px 0">Noch keine Szenen verknüpft.</div>'}
-      <label class="modal-lbl" style="margin-top:12px">Weitere Szene verknüpfen</label>
-      <select class="modal-inp" id="beat-sc-sel">
-        <option value="">— Szene wählen —</option>${opts}
-      </select>
-      <div class="modal-btns">
+    const scOpts = allSc.filter(s=>!linked.includes(s.id)).map(s => `<option value="${s.id}">${esc(s.title||'Szene')}</option>`).join('');
+    const cardOpts = allCards.filter(c=>!linkedCards.includes(c.id)).map(c => `<option value="${c.id}">${esc(c.title||'Planer-Block')}</option>`).join('');
+
+    showModal(`<div class="modal-title">Verknüpfungen: ${esc(b.title||'—')}</div>
+      <label class="modal-lbl">Szenen</label>
+      ${scRows || noSc}
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <select class="modal-inp" id="beat-sc-sel" style="flex:1"><option value="">— Szene wählen —</option>${scOpts}</select>
+        <button class="mbtn primary" onclick="Beats._linkScene('${beatId}',document.getElementById('beat-sc-sel').value)">＋ Szene</button>
+      </div>
+      <label class="modal-lbl" style="margin-top:14px">Planer-Blöcke</label>
+      ${cardRows || noCard}
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <select class="modal-inp" id="beat-card-sel" style="flex:1"><option value="">— Block wählen —</option>${cardOpts}</select>
+        <button class="mbtn primary" onclick="Beats._linkCard('${beatId}',document.getElementById('beat-card-sel').value)">＋ Block</button>
+      </div>
+      <div class="modal-btns" style="margin-top:14px">
         <button class="mbtn" onclick="closeModal()">Schließen</button>
-        <button class="mbtn primary" onclick="Beats._linkScene('${beatId}',document.getElementById('beat-sc-sel').value)">Verknüpfen</button>
       </div>`);
   }
 
@@ -7187,7 +7654,7 @@ const Beats = (() => {
     if (b.sceneId && !b.sceneIds.includes(b.sceneId)) b.sceneIds.push(b.sceneId);
     if (!b.sceneIds.includes(sceneId)) b.sceneIds.push(sceneId);
     b.sceneId = b.sceneIds[0]||'';
-    save(); closeModal(); render(); toast('Szene verknüpft.','ok');
+    save(); openBeatScenePicker(beatId); render(); toast('Szene verknüpft.','ok');
   }
 
   function _unlinkScene(beatId, sceneId) {
@@ -7196,6 +7663,21 @@ const Beats = (() => {
     b.sceneIds=b.sceneIds.filter(id=>id!==sceneId);
     if (b.sceneId===sceneId) b.sceneId=b.sceneIds[0]||'';
     save(); render(); toast('Szene entfernt.','ok');
+  }
+
+  function _linkCard(beatId, cardId) {
+    if (!cardId) { toast('Bitte Planer-Block wählen.','err'); return; }
+    const m=getModel(), b=m.beats.find(x=>x.id===beatId); if(!b) return;
+    if (!Array.isArray(b.cardIds)) b.cardIds=[];
+    if (!b.cardIds.includes(cardId)) b.cardIds.push(cardId);
+    save(); openBeatScenePicker(beatId); render(); toast('Planer-Block verknüpft.','ok');
+  }
+
+  function _unlinkCard(beatId, cardId) {
+    const m=getModel(), b=m.beats.find(x=>x.id===beatId); if(!b) return;
+    if (!Array.isArray(b.cardIds)) b.cardIds=[];
+    b.cardIds=b.cardIds.filter(id=>id!==cardId);
+    save(); render(); toast('Planer-Block entfernt.','ok');
   }
 
   /* ── DRAG & DROP ─────────────────────────────────────────────── */
@@ -7326,6 +7808,13 @@ const Beats = (() => {
     } catch(_){}
   }
 
+  function toggleLayout() {
+    const grid = el('beats-grid'); if (!grid) return;
+    const btn = el('beats-cols-btn');
+    const fixed = grid.classList.toggle('cols-fixed');
+    if (btn) { btn.style.color = fixed ? 'var(--accent)' : ''; btn.style.borderColor = fixed ? 'var(--accent2)' : ''; }
+  }
+
   /* ── EXPORT / IMPORT ─────────────────────────────────────────── */
   function exportJSON() {
     const blob = new Blob([JSON.stringify(bState,null,2)],{type:'application/json'});
@@ -7354,12 +7843,327 @@ const Beats = (() => {
   return {
     init, applyTemplate, addBoard, switchBoard, deleteBoard, renameActiveBoard,
     addBeat, addPhase, openEditor, closeEditor, saveEditor, deleteBeat,
-    exportJSON, importJSON, toggleMethods,
-    openBeatScenePicker, _linkScene, _unlinkScene,
+    exportJSON, importJSON, toggleMethods, setView,
+    openBeatScenePicker, _linkScene, _unlinkScene, _linkCard, _unlinkCard, toggleLayout,
     _getState: () => bState,
   };
 })();
 window.Beats = Beats;
+
+/* ── BEAT-NOTIZEN ──────────────────────────────────────────────────────── */
+const BeatNotizen = (() => {
+  const uid = () => 'k'+Math.random().toString(36).slice(2,10);
+  let _editId = null;
+
+  function kacheln() {
+    if (!state.planner) state.planner = { cards:[], order:{} };
+    if (!state.planner.cards) state.planner.cards = [];
+    return state.planner.cards.filter(c => c._kachel);
+  }
+
+  let _strandCols = false;
+
+  // ── helpers ──────────────────────────────────────────────────────────────
+  function _board() {
+    const bs = typeof Beats !== 'undefined' && Beats._getState ? Beats._getState() : null;
+    if (!bs) return null;
+    return bs.boards.find(b=>b.id===bs.activeBoardId) || bs.boards[0] || null;
+  }
+
+  function _kachelCardHtml(k) {
+    const strands = typeof getStrands==='function' ? getStrands() : [];
+    const strand = strands.find(s=>s.id===k.strandId);
+    const sc = k.sceneId ? (typeof findScene==='function' ? findScene(k.sceneId) : null) : null;
+    const kDate = k.date || k.datum || '';
+    const kTitle = k.title || k.titel || '(ohne Titel)';
+    const kNote = k.note || k.notes || k.notiz || '';
+    const hasMeta = kDate || sc || k.ort;
+    let badges = '';
+    if (kDate) badges += `<span class="bn-badge bn-badge-date">📅 ${esc(kDate)}</span>`;
+    if (sc) badges += `<span class="bn-badge bn-badge-scene">↗ ${esc((sc.sc&&sc.sc.title)||'Szene')}</span>`;
+    if (k.ort) badges += `<span class="bn-badge bn-badge-ort">📍 ${esc(k.ort)}</span>`;
+    return `<div class="bn-kachel-card" data-kid="${k.id}" style="border-left-color:${strand?strand.color:'var(--border2)'}">
+      <div class="bn-card-title">${esc(kTitle)}</div>
+      ${hasMeta ? `<div class="bn-card-badges">${badges}</div>` : `<div class="bn-card-nometa">Ohne Metadaten</div>`}
+      ${kNote ? `<div class="bn-card-note">${esc(kNote)}</div>` : ''}
+    </div>`;
+  }
+
+  // Renders cards for one beat – either flat list or strand columns
+  function _beatCardsHtml(beatCards, beatId) {
+    if (!_strandCols) {
+      if (!beatCards.length)
+        return `<div class="bn-beat-empty"><button class="zoom-btn" onclick="BeatNotizen.addKachel(${beatId?`'${beatId}'`:'null'})">＋ Idee</button></div>`;
+      return beatCards.map(k=>_kachelCardHtml(k)).join('');
+    }
+    // strand columns
+    const strands = typeof getStrands==='function' ? getStrands() : [];
+    const cols = strands.length
+      ? [...strands, {id:'none', label:'Ohne Strang', color:'var(--border2)'}]
+      : [{id:'none', label:'Ideen', color:'var(--border2)'}];
+    const colHtml = cols.map(s => {
+      const items = beatCards.filter(k=>(k.strandId||'none')===(s.id||'none'));
+      return `<div class="bn-sc">
+        <div class="bn-sc-hdr" style="color:${s.color}">${esc(s.label||s.id)}</div>
+        ${items.map(k=>_kachelCardHtml(k)).join('')}
+        <button class="zoom-btn bn-sc-add" onclick="BeatNotizen._addWithStrand(${beatId?`'${beatId}'`:'null'},'${s.id}')">＋</button>
+      </div>`;
+    }).join('');
+    return `<div class="bn-sc-wrap">${colHtml}</div>`;
+  }
+
+  // ── main render ──────────────────────────────────────────────────────────
+  function render() {
+    const el = document.getElementById('bn-view');
+    const countEl = document.getElementById('bn-count');
+    const beatCountEl = document.getElementById('bn-beat-count');
+    if (!el) return;
+
+    const all = kacheln();
+    const board = _board();
+
+    // header counts
+    if (countEl) countEl.textContent = all.length + (all.length===1?' Idee':' Ideen');
+    if (beatCountEl) {
+      if (board) {
+        const total = (board.beats||[]).length;
+        const covered = (board.beats||[]).filter(b=>all.some(k=>k.beatId===b.id)).length;
+        beatCountEl.textContent = total ? `· Beats: ${covered}/${total}` : '';
+      } else beatCountEl.textContent = '';
+    }
+
+    if (!board) {
+      el.innerHTML = `<div class="bn-empty">Kein Beat-Board aktiv.</div>`;
+      return;
+    }
+
+    const { phases=[], beats=[] } = board;
+    let html = '';
+
+    for (const phase of phases) {
+      const pb = beats.filter(b=>b.phaseId===phase.id);
+      if (!pb.length) continue;
+      const phaseCnt = pb.reduce((s,b)=>s+all.filter(k=>k.beatId===b.id).length,0);
+      html += `<div class="bn-phase-row">
+        <span>${esc(phase.name||'Phase')}</span>
+        ${phaseCnt?`<span class="bn-phase-cnt">${phaseCnt} Idee${phaseCnt!==1?'n':''}</span>`:''}
+      </div>`;
+      for (const beat of pb) {
+        // key: beat.id (stable random string) === kachel.beatId
+        const beatCards = all.filter(k => k.beatId === beat.id);
+        html += `<div class="bn-beat-row">
+          <div class="bn-beat-label">
+            <span class="bn-beat-label-title">${esc(beat.title||'Beat')}</span>
+            ${beatCards.length?`<span class="bn-beat-label-cnt">${beatCards.length}</span>`:''}
+            <button class="zoom-btn bn-beat-add" onclick="BeatNotizen.addKachel('${beat.id}')">＋</button>
+          </div>
+          <div class="bn-beat-cards">
+            ${_beatCardsHtml(beatCards, beat.id)}
+          </div>
+        </div>`;
+      }
+    }
+
+    // unassigned
+    const unassigned = all.filter(k=>!k.beatId);
+    if (unassigned.length) {
+      html += `<div class="bn-phase-row bn-phase-row-muted"><span>Ohne Beat</span><span class="bn-phase-cnt">${unassigned.length}</span></div>`;
+      html += `<div class="bn-beat-row">
+        <div class="bn-beat-label"><span class="bn-beat-label-title" style="opacity:.4">–</span></div>
+        <div class="bn-beat-cards">${_beatCardsHtml(unassigned, null)}</div>
+      </div>`;
+    }
+
+    el.innerHTML = html || `<div class="bn-empty">Noch keine Ideen.<br><br><button class="zoom-btn" onclick="BeatNotizen.addKachel(null)">＋ Erste Idee</button></div>`;
+    el.querySelectorAll('[data-kid]').forEach(c => {
+      c.addEventListener('click', () => openEditor(c.dataset.kid));
+    });
+  }
+
+  function toggleStrandCols() {
+    _strandCols = !_strandCols;
+    const btn = document.getElementById('beats-strand-btn');
+    if (btn) btn.style.color = _strandCols ? 'var(--accent)' : '';
+    render();
+  }
+
+  function _addWithStrand(beatId, strandId) {
+    if (!state.planner) state.planner = { cards:[], order:{} };
+    if (!state.planner.cards) state.planner.cards = [];
+    if (!state.planner.order) state.planner.order = {};
+    const k = { id:uid(), _kachel:true, title:'', note:'', beatId:beatId||null,
+      strandId:strandId||'none', ort:'', date:'', dateManual:false, sceneId:null, status:'idea' };
+    state.planner.cards.push(k);
+    const sid = k.strandId || 'none';
+    if (!state.planner.order[sid]) state.planner.order[sid] = [];
+    state.planner.order[sid].push(k.id);
+    saveState();
+    openEditor(k.id, true);
+  }
+
+  function addKachel(beatId) {
+    if (!state.planner) state.planner = { cards:[], order:{} };
+    if (!state.planner.cards) state.planner.cards = [];
+    if (!state.planner.order) state.planner.order = {};
+    const k = { id:uid(), _kachel:true, title:'', note:'', beatId:beatId||null,
+      strandId:'none', ort:'', date:'', dateManual:false, sceneId:null, status:'idea' };
+    state.planner.cards.push(k);
+    const sid = k.strandId || 'none';
+    if (!state.planner.order[sid]) state.planner.order[sid] = [];
+    state.planner.order[sid].push(k.id);
+    saveState();
+    openEditor(k.id, true);
+  }
+
+  function openEditor(id, isNew) {
+    _editId = id;
+    const k = (state.planner?.cards||[]).find(x=>x.id===id);
+    if (!k) return;
+    const ov = document.getElementById('kn-overlay');
+    const body = document.getElementById('kn-body');
+    const titleEl = document.getElementById('kn-editor-title');
+    if (!ov||!body) return;
+    if (titleEl) titleEl.textContent = isNew ? 'Neue Planungsnotiz' : 'Planungsnotiz bearbeiten';
+    const delBtn = document.getElementById('kn-del-btn');
+    if (delBtn) delBtn.style.display = isNew?'none':'';
+
+    // Beat options
+    const bs = typeof Beats!=='undefined'&&Beats._getState?Beats._getState():null;
+    const board = bs?(bs.boards.find(b=>b.id===bs.activeBoardId)||bs.boards[0]):null;
+    let beatOpts = '<option value="">— Kein Beat —</option>';
+    if (board) {
+      for (const phase of (board.phases||[])) {
+        const pb = (board.beats||[]).filter(b=>b.phaseId===phase.id);
+        if (!pb.length) continue;
+        beatOpts += `<optgroup label="${esc(phase.name||'Phase')}">`;
+        pb.forEach(b=>{ beatOpts+=`<option value="${b.id}"${k.beatId===b.id?' selected':''}>${esc(b.title||'Beat')}</option>`; });
+        beatOpts += '</optgroup>';
+      }
+    }
+
+    // Scene options
+    const allSc = typeof getAllScenes==='function'?getAllScenes():[];
+    let scOpts = '<option value="">— Keine Szene —</option>';
+    allSc.forEach(({vol,ch,sc})=>{scOpts+=`<option value="${sc.id}"${k.sceneId===sc.id?' selected':''}>${esc(sc.title)} — ${esc(vol.title)} › ${esc(ch.title)}</option>`;});
+
+    // Strand dots
+    const strands = typeof getStrands==='function'?getStrands():[];
+    let strandHtml = `<label data-sid="" style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--mono);font-size:9px;color:var(--text3);padding:3px 6px;border:1px solid ${!k.strandId?'var(--text3)':'transparent'};border-radius:2px" onclick="BeatNotizen._setStrand(this)">
+      <span style="width:10px;height:10px;border-radius:50%;background:var(--border2);display:inline-block"></span>Kein Strang</label>`;
+    strands.forEach(s=>{strandHtml+=`<label data-sid="${s.id}" style="display:flex;align-items:center;gap:6px;cursor:pointer;font-family:var(--mono);font-size:9px;color:var(--text2);padding:3px 6px;border:1px solid ${k.strandId===s.id?'var(--text3)':'transparent'};border-radius:2px;transition:border-color .1s" onclick="BeatNotizen._setStrand(this)"><span style="width:10px;height:10px;border-radius:50%;background:${s.color};display:inline-block"></span>${esc(s.label||s.id)}</label>`;});
+
+    // Format date for input
+    const kDate = k.date || k.datum || '';
+    let dateVal = '';
+    if (kDate) {
+      if (kDate.match(/^\d{2}\.\d{2}\.\d{4}$/)) {
+        const [d,m,y]=kDate.split('.');dateVal=`${y}-${m}-${d}`;
+      } else { dateVal=kDate; }
+    }
+
+    body.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div class="beats-ml">Beat (Optional)</div>
+          <select class="beats-select" id="kn-beat" style="width:100%">${beatOpts}</select>
+        </div>
+        <div></div>
+      </div>
+      <div>
+        <div class="beats-ml">Titel</div>
+        <input class="beats-inp" id="kn-titel" value="${esc(k.title||k.titel||'')}" placeholder="Was soll in dieser Idee passieren?">
+      </div>
+      <div>
+        <div class="beats-ml">Notiz</div>
+        <textarea class="beats-ta" id="kn-notiz" rows="4" placeholder="Was soll in dieser Idee passieren?">${esc(k.note||k.notes||k.notiz||'')}</textarea>
+      </div>
+      <div>
+        <div class="beats-ml">Strang</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;padding:8px;background:var(--bg1);border:1px solid var(--border)" id="kn-strand-wrap">${strandHtml}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <div class="beats-ml">Datum (Optional)</div>
+          <input class="beats-inp" id="kn-datum" type="date" value="${dateVal}">
+        </div>
+        <div>
+          <div class="beats-ml">Ort (Optional)</div>
+          <input class="beats-inp" id="kn-ort" value="${esc(k.ort)}" placeholder="z.B. Hogwarts"
+            list="kn-ort-list" autocomplete="off">
+          <datalist id="kn-ort-list">${getAllLocations().map(l=>`<option value="${esc(l)}">`).join('')}</datalist>
+        </div>
+      </div>
+      <div>
+        <div class="beats-ml">Szene verknüpfen (Optional)</div>
+        <select class="beats-select" id="kn-scene" style="width:100%">${scOpts}</select>
+      </div>`;
+
+    ov.classList.add('open');
+    setTimeout(()=>{const i=document.getElementById('kn-titel');if(i)i.focus();},80);
+  }
+
+  function _setStrand(el) {
+    document.querySelectorAll('#kn-strand-wrap label').forEach(l=>{ l.style.borderColor='transparent'; });
+    el.style.borderColor = 'var(--text3)';
+    const sid = el.dataset.sid;
+    const k = kacheln().find(x=>x.id===_editId);
+    if (k) k._ts = sid;
+  }
+
+  function saveKachel() {
+    const k = (state.planner?.cards||[]).find(x=>x.id===_editId);
+    if (!k) return;
+    const oldStrand = k.strandId || 'none';
+    k.title = (document.getElementById('kn-titel')?.value||'').trim();
+    k.note = (document.getElementById('kn-notiz')?.value||'').trim();
+    k.beatId = document.getElementById('kn-beat')?.value||null;
+    const dv = document.getElementById('kn-datum')?.value||'';
+    k.date = dv;
+    k.dateManual = !!dv;
+    k.ort = (document.getElementById('kn-ort')?.value||'').trim();
+    k.sceneId = document.getElementById('kn-scene')?.value||null;
+    // Get strand from visual selection
+    const activeLabel = [...(document.querySelectorAll('#kn-strand-wrap label')||[])].find(l=>l.style.borderColor&&l.style.borderColor!=='transparent');
+    if (activeLabel) { k.strandId = activeLabel.dataset.sid||'none'; }
+    else if (k._ts !== undefined) { k.strandId = k._ts||'none'; }
+    delete k._ts;
+    // Sync planner order on strand change
+    const newStrand = k.strandId || 'none';
+    if (!state.planner.order) state.planner.order = {};
+    if (oldStrand !== newStrand) {
+      if (state.planner.order[oldStrand])
+        state.planner.order[oldStrand] = state.planner.order[oldStrand].filter(id=>id!==k.id);
+      if (!state.planner.order[newStrand]) state.planner.order[newStrand] = [];
+      if (!state.planner.order[newStrand].includes(k.id)) state.planner.order[newStrand].push(k.id);
+    } else {
+      // Ensure card is in order at all (could be missing from pre-fix data)
+      if (!state.planner.order[newStrand]) state.planner.order[newStrand] = [];
+      if (!state.planner.order[newStrand].includes(k.id)) state.planner.order[newStrand].push(k.id);
+    }
+    saveState();
+    closeEditor();
+    render();
+    try{showToast('Kachel gespeichert','ok');}catch(_){}
+  }
+
+  function deleteKachel() {
+    if (!confirm('Kachel löschen?')) return;
+    if (state.planner?.cards) state.planner.cards = state.planner.cards.filter(x=>x.id!==_editId);
+    saveState(); closeEditor(); render();
+    try{showToast('Kachel gelöscht','ok');}catch(_){}
+  }
+
+  function closeEditor() {
+    const ov = document.getElementById('kn-overlay');
+    if (ov) ov.classList.remove('open');
+    _editId = null;
+  }
+
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeEditor(); });
+
+  return { render, addKachel, _addWithStrand, openEditor, saveKachel, deleteKachel, closeEditor, _setStrand, toggleStrandCols };
+})();
+window.BeatNotizen = BeatNotizen;
 
 
 /* ── BEATS PREVIEW ────────────────────────────────────────────── */
@@ -7507,9 +8311,14 @@ const GridPlan = (() => {
     if(!ss.length){ _toast('Keine Stränge – im Planer anlegen.','err'); return; }
     save(); render(); _toast(ss.length+' Stränge synchronisiert.','ok');
   }
-  function onRangeChange(){
+  function applyRange(){
     const s=$('gp-start'),e=$('gp-end'); if(!s||!e)return;
-    g.start=s.value; g.end=e.value; save(); render();
+    const sv=s.value, ev=e.value;
+    if(!sv||!ev){ _toast('Bitte Von- und Bis-Datum ausfüllen.','err'); return; }
+    if(sv>ev){ _toast('Das Startdatum muss vor dem Enddatum liegen.','err'); return; }
+    const days=Math.round((new Date(ev)-new Date(sv))/(86400000));
+    if(days>1000){ _toast('Datumsbereich zu groß (max. 1000 Tage). Bitte einschränken.','err'); return; }
+    g.start=sv; g.end=ev; save(); render();
   }
   function setMode(mode,btn){
     g.mode=mode; save();
@@ -7938,7 +8747,7 @@ const GridPlan = (() => {
     _toast('Szene verschoben: ' + (foundSc.title||'—'), 'ok');
   }
 
-  return { init, render, syncStrands, onRangeChange, setMode, toggleHideEmpty,
+  return { init, render, syncStrands, applyRange, setMode, toggleHideEmpty,
     onDayNoteBlur, onCellNoteBlur, onChNoteBlur,
     openLinkModal, closeLinkModal, filterLinkList, pickScene, unlinkScene,
     openChLinkModal, createChScene, doCreateCh,
@@ -8415,7 +9224,7 @@ const ErrConsole = (() => {
 // ── SETTINGS STATE ─────────────────────────────────────────────
 const SettingsState = (() => {
   const LS = 'skriptorium.settings.v1';
-  const def = () => ({ fontSize:14, uiScale:100, fontFamily:'serif', accent:'#c8a96e', bg:'#090909' });
+  const def = () => ({ fontSize:14, uiScale:100, fontFamily:'serif', accent:'#c8a96e', bg:'#090909', wordGoal:0 });
   let s = null;
   const dark = hex => { try { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return '#'+[r,g,b].map(v=>Math.max(0,Math.round(v*.7)).toString(16).padStart(2,'0')).join(''); }catch(_){return '#7a6040';} };
   const alph = (hex,a) => { try { const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16); return 'rgba('+r+','+g+','+b+','+a+')'; }catch(_){return 'rgba(200,169,110,.1)';} };
@@ -8451,7 +9260,123 @@ const SettingsState = (() => {
   };
 })();
 
+// ── AUTO BACKUP ────────────────────────────────────────────────────────────────
+const AutoBackup = (() => {
+  const LS_LAST   = 'skriptorium.backup.last';
+  const IDB_DB    = 'skriptorium-backup';
+  const IDB_STORE = 'handles';
+  const IDB_KEY   = 'dirHandle';
+  let _handle = null;
+
+  function _openIDB() {
+    return new Promise((res, rej) => {
+      const req = indexedDB.open(IDB_DB, 1);
+      req.onupgradeneeded = e => e.target.result.createObjectStore(IDB_STORE);
+      req.onsuccess = e => res(e.target.result);
+      req.onerror   = e => rej(e.target.error);
+    });
+  }
+  async function _loadHandle() {
+    try {
+      const db = await _openIDB();
+      return await new Promise((res, rej) => {
+        const tx = db.transaction(IDB_STORE, 'readonly');
+        const req = tx.objectStore(IDB_STORE).get(IDB_KEY);
+        req.onsuccess = e => res(e.target.result || null);
+        req.onerror   = e => rej(e.target.error);
+      });
+    } catch(_) { return null; }
+  }
+  async function _saveHandle(h) {
+    try {
+      const db = await _openIDB();
+      return await new Promise((res, rej) => {
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        const req = tx.objectStore(IDB_STORE).put(h, IDB_KEY);
+        req.onsuccess = () => res();
+        req.onerror   = e => rej(e.target.error);
+      });
+    } catch(_) {}
+  }
+  async function _clearHandle() {
+    try {
+      const db = await _openIDB();
+      await new Promise((res, rej) => {
+        const tx = db.transaction(IDB_STORE, 'readwrite');
+        const req = tx.objectStore(IDB_STORE).delete(IDB_KEY);
+        req.onsuccess = () => res();
+        req.onerror   = e => rej(e.target.error);
+      });
+    } catch(_) {}
+    _handle = null;
+  }
+
+  async function pickFolder() {
+    if (!window.showDirectoryPicker) {
+      toast('Auto-Backup benötigt Chrome oder Edge (File System Access API).', 'err');
+      return;
+    }
+    try {
+      const h = await window.showDirectoryPicker({ mode: 'readwrite' });
+      _handle = h;
+      await _saveHandle(h);
+      toast('Backup-Ordner gespeichert. Erstes Backup wird erstellt …', 'ok');
+      await backup(false);
+      renderSettings();
+    } catch(e) {
+      if (e.name !== 'AbortError') toast('Ordner konnte nicht gewählt werden: ' + e.message, 'err');
+    }
+  }
+
+  async function backup(silent = true) {
+    if (!_handle) return;
+    try {
+      const perm = await _handle.queryPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') {
+        const req = await _handle.requestPermission({ mode: 'readwrite' });
+        if (req !== 'granted') { if (!silent) toast('Keine Schreibberechtigung für Backup-Ordner.', 'err'); return; }
+      }
+      const jsonStr = await App.exportProject(true);
+      if (!jsonStr) return;
+      const fname = 'skriptorium_backup.json';
+      const fh = await _handle.getFileHandle(fname, { create: true });
+      const w  = await fh.createWritable();
+      await w.write(jsonStr);
+      await w.close();
+      localStorage.setItem(LS_LAST, new Date().toISOString());
+      if (!silent) toast('Backup gespeichert: ' + fname, 'ok');
+    } catch(e) {
+      if (!silent) toast('Backup fehlgeschlagen: ' + e.message, 'err');
+    }
+  }
+
+  async function clearFolder() {
+    await _clearHandle();
+    toast('Backup-Ordner entfernt.', 'ok');
+    renderSettings();
+  }
+
+  function getStatus() {
+    const last = localStorage.getItem(LS_LAST);
+    const hasHandle = !!_handle;
+    return { hasHandle, last: last ? new Date(last).toLocaleString('de-DE') : null };
+  }
+
+  async function init() {
+    _handle = await _loadHandle();
+    if (!_handle) return;
+    // Auto-backup once per day
+    const last = localStorage.getItem(LS_LAST);
+    if (!last || (Date.now() - new Date(last).getTime()) > 86400000) {
+      await backup(true);
+    }
+  }
+
+  return { pickFolder, backup, clearFolder, getStatus, init };
+})();
+
 // ── RENDER SETTINGS ────────────────────────────────────────────
+// ── REDESIGNED SETTINGS ────────────────────────────────────────────────────────
 function renderSettings() {
   const panel = document.getElementById('settings-panel');
   if (!panel) return;
@@ -8459,71 +9384,782 @@ function renderSettings() {
   const ACCENTS = ['#c8a96e','#e07a5f','#81b29a','#6ba3d6','#c47fba','#d4a373','#7bb8a6','#e8b86d'];
   const BGS     = ['#090909','#0d0d0d','#111118','#0c0f0f','#0f0c09'];
   const FONTS   = [{v:'serif',l:'Georgia (Serif)'},{v:'sans',l:'System UI (Sans)'},{v:'mono',l:'Courier (Mono)'}];
-  const sw = (arr,cur,fn) => arr.map(c=>'<div class="set-swatch'+(cur===c?' active':'')+'" style="background:'+c+'" onclick="'+fn.replace(/C/g,c)+'" title="'+c+'"></div>').join('');
+  const sw = (arr,cur,fn) => arr.map(c=>`<div class="set-swatch${cur===c?' active':''}" style="background:${c}" onclick="${fn.replace(/C/g,c)}" title="${c}"></div>`).join('');
 
-  panel.innerHTML =
-    '<div class="set-section">Schrift &amp; Darstellung</div>'+
-    '<div class="set-row"><div class="set-lbl">Schriftgr\u00f6\u00dfe Editor<small>px, 10\u201330</small></div>'+
-    '<input class="set-inp" type="number" min="10" max="30" value="'+s.fontSize+'" onchange="SettingsState.set({fontSize:Math.min(30,Math.max(10,+this.value||14))})"></div>'+
-    '<div class="set-row"><div class="set-lbl">Schriftart</div>'+
-    '<select class="set-sel" onchange="SettingsState.set({fontFamily:this.value})">'+FONTS.map(f=>'<option value="'+f.v+'"'+(s.fontFamily===f.v?' selected':'')+'>'+f.l+'</option>').join('')+'</select></div>'+
-    '<div class="set-row"><div class="set-lbl">UI-Zoom<small>80\u2013120%</small></div>'+
-    '<select class="set-sel" onchange="SettingsState.set({uiScale:+this.value})">'+[80,90,100,110,120].map(v=>'<option value="'+v+'"'+(s.uiScale===v?' selected':'')+'>'+v+'%</option>').join('')+'</select></div>'+
-    '<div class="set-preview">Die Reise beginnt mit einem Schritt. \u2014 Vorschau Schriftart &amp; Gr\u00f6\u00dfe.</div>'+
+  const THEMES = [
+    {id:'dark-gold',name:'Dark Gold',bg:'#090909',accent:'#c8a96e'},
+    {id:'night-blue',name:'Night Blue',bg:'#080c12',accent:'#6ba3d6'},
+    {id:'forest',name:'Forest',bg:'#080f0a',accent:'#81b29a'},
+    {id:'ember',name:'Ember',bg:'#0d0806',accent:'#e07a5f'},
+    {id:'violet',name:'Violet',bg:'#0a080f',accent:'#c47fba'},
+    {id:'sepia',name:'Sepia',bg:'#100d08',accent:'#d4a373'},
+    {id:'slate',name:'Slate',bg:'#080a0c',accent:'#7bb8a6'},
+    {id:'contrast',name:'High Contrast',bg:'#000000',accent:'#ffffff'},
+  ];
 
-    '<div class="set-section" style="margin-top:16px">Farben</div>'+
-    '<div class="set-row"><div class="set-lbl">Akzentfarbe<small>Buttons, Tabs, aktive Elemente</small></div>'+
-    '<div class="set-swatch-row">'+sw(ACCENTS,s.accent,"SettingsState.set({accent:'C'});renderSettings()")+
-    '<input type="color" value="'+s.accent+'" style="width:28px;height:22px;padding:1px;cursor:pointer;background:none;border:1px solid var(--border2)" onchange="SettingsState.set({accent:this.value});renderSettings()"></div></div>'+
-    '<div class="set-row"><div class="set-lbl">Hintergrundfarbe<small>Basisfarbe, Zwischent\u00f6ne automatisch</small></div>'+
-    '<div class="set-swatch-row">'+sw(BGS,s.bg,"SettingsState.set({bg:'C'});renderSettings()")+
-    '<input type="color" value="'+(s.bg||'#090909')+'" style="width:28px;height:22px;padding:1px;cursor:pointer;background:none;border:1px solid var(--border2)" onchange="SettingsState.set({bg:this.value});renderSettings()"></div></div>'+
-    '<div class="set-row"><div class="set-lbl">Zur\u00fccksetzen<small>Alle Einstellungen auf Standard</small></div>'+
-    '<button class="set-btn danger" onclick="localStorage.removeItem(\'skriptorium.settings.v1\');SettingsState.load();renderSettings();toast(\'Einstellungen zur\u00fcckgesetzt\',\'ok\')">&#8630; Reset</button></div>'+
-
-    '<div class="set-section" style="margin-top:16px">Export &amp; Import</div>'+
-    '<div class="set-row"><div class="set-lbl">Alle Projekte sichern<small>JSON mit allen Projekten, Beats, Raster, Spotify</small></div><button class="set-btn primary" onclick="App.exportProject()">\u2193 JSON</button></div>'+
-    '<div class="set-row"><div class="set-lbl">Projekt importieren<small>Einzel- oder Mehrprojekt-JSON</small></div><button class="set-btn" onclick="App.importProject()">\u2191 JSON</button></div>'+
-    '<div class="set-row"><div class="set-lbl">Markdown importieren</div><button class="set-btn" onclick="App.importMD()">\u2191 .md</button></div>'+
-    '<div class="set-row"><div class="set-lbl">Charaktere</div><div style="display:flex;gap:5px"><button class="set-btn" onclick="App.exportCharsJSON()">\u2193</button><button class="set-btn" onclick="App.importChars()">\u2191</button></div></div>'+
-    '<div class="set-row"><div class="set-lbl">Orte</div><div style="display:flex;gap:5px"><button class="set-btn" onclick="App.exportLocsJSON()">\u2193</button><button class="set-btn" onclick="App.importLocs()">\u2191</button></div></div>'+
-    '<div class="set-row"><div class="set-lbl">HTML/Word-Export</div><button class="set-btn" onclick="App.exportHTML()">\u2193 HTML</button></div>'+
-    '<div class="set-row"><div class="set-lbl">Markdown-Export</div><button class="set-btn" onclick="App.exportMarkdown()">\u2193 MD</button></div>'+
-    '<div class="set-row"><div class="set-lbl">Speicher-Info</div><button class="set-btn" onclick="Settings_storageInfo()">\u2139 Anzeigen</button></div>'+
-
-    '<div class="set-section" style="margin-top:16px">&#9888; Daten-Wiederherstellung</div>'+
-    '<div class="set-row" style="flex-wrap:wrap;gap:6px"><div class="set-lbl">Notfall-Assistent f\u00fcr fehlende Projekte.<small>Scannt alle IndexedDB-Keys.</small></div>'+
-    '<button class="set-btn danger" onclick="App.showRecovery()">&#9888; Assistent \u00f6ffnen</button></div>'+
-
-    '<div class="set-section" style="margin-top:16px">Fehler-Konsole</div>'+
-    '<div class="set-row" style="flex-wrap:wrap;gap:6px">'+
-    '<div class="set-lbl">JS-Fehler und Warnungen dieser Sitzung.<small>Automatisch ab Seitenstart erfasst.</small></div>'+
-    '<div style="display:flex;gap:5px"><button class="set-btn" onclick="ErrConsole.render(document.getElementById(\'err-console\'))">&#8635;</button>'+
-    '<button class="set-btn danger" onclick="ErrConsole.clear();ErrConsole.render(document.getElementById(\'err-console\'))">&#10005;</button></div>'+
-    '</div>'+
-    '<div id="err-console"></div>'+
-
-    '<div class="set-section" style="margin-top:16px">Info</div>'+
-    '<div class="set-row"><div class="set-lbl">Skriptorium</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3)">2.2 \u2014 Feb 2026</div></div>';
-
-  ErrConsole.render(document.getElementById('err-console'));
+  panel.innerHTML = `<div class="set-page">
+    <div class="set-group">
+      <div class="set-group-hdr">🎨 Erscheinungsbild — Preset Themes</div>
+      <div class="set-theme-grid">${THEMES.map(t=>`
+        <div class="set-theme-card${s.bg===t.bg&&s.accent===t.accent?' active':''}" onclick="SettingsState.set({bg:'${t.bg}',accent:'${t.accent}'});renderSettings()">
+          <div class="set-theme-swatch" style="background:linear-gradient(135deg,${t.bg} 50%,${t.accent} 100%)"></div>
+          <div class="set-theme-name">${t.name}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">✏ Schrift &amp; Darstellung</div>
+      <div class="set-row"><div class="set-lbl">Schriftgröße Editor<small>px, 10–30</small></div>
+        <input class="set-inp" type="number" min="10" max="30" value="${s.fontSize}" onchange="SettingsState.set({fontSize:Math.min(30,Math.max(10,+this.value||14))})"></div>
+      <div class="set-row"><div class="set-lbl">Schriftart</div>
+        <select class="set-sel" onchange="SettingsState.set({fontFamily:this.value})">${FONTS.map(f=>`<option value="${f.v}"${s.fontFamily===f.v?' selected':''}>${f.l}</option>`).join('')}</select></div>
+      <div class="set-row"><div class="set-lbl">UI-Zoom<small>80–120%</small></div>
+        <select class="set-sel" onchange="SettingsState.set({uiScale:+this.value})">${[80,90,100,110,120].map(v=>`<option value="${v}"${s.uiScale===v?' selected':''}>${v}%</option>`).join('')}</select></div>
+      <div class="set-row"><div class="set-lbl">Zielwortzahl (Buch)<small>0 = aktueller Gesamtstand als Basis für Beats-Fortschritt</small></div>
+        <input class="set-inp" type="number" min="0" step="1000" value="${s.wordGoal||0}"
+          onchange="SettingsState.set({wordGoal:Math.max(0,+this.value||0)})"></div>
+      <div class="set-preview">Die Reise beginnt mit einem Schritt. — Vorschau Schriftart &amp; Größe.</div>
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">🎨 Farben — Individuelle Anpassung</div>
+      <div class="set-row"><div class="set-lbl">Akzentfarbe<small>Buttons, Tabs, aktive Elemente</small></div>
+        <div class="set-swatch-row">${sw(ACCENTS,s.accent,"SettingsState.set({accent:'C'});renderSettings()")}
+        <input type="color" value="${s.accent}" style="width:28px;height:22px;padding:1px;cursor:pointer;background:none;border:1px solid var(--border2)" onchange="SettingsState.set({accent:this.value});renderSettings()"></div></div>
+      <div class="set-row"><div class="set-lbl">Hintergrundfarbe<small>Basisfarbe, Zwischentöne automatisch</small></div>
+        <div class="set-swatch-row">${sw(BGS,s.bg,"SettingsState.set({bg:'C'});renderSettings()")}
+        <input type="color" value="${s.bg||'#090909'}" style="width:28px;height:22px;padding:1px;cursor:pointer;background:none;border:1px solid var(--border2)" onchange="SettingsState.set({bg:this.value});renderSettings()"></div></div>
+      <div class="set-row"><div class="set-lbl">Zurücksetzen<small>Alle Einstellungen auf Standard</small></div>
+        <button class="set-btn danger" onclick="localStorage.removeItem('skriptorium.settings.v1');SettingsState.load();renderSettings();toast('Einstellungen zurückgesetzt','ok')">↺ Reset</button></div>
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">💾 Export &amp; Import</div>
+      <div class="set-row"><div class="set-lbl">Alle Projekte sichern<small>JSON mit allen Projekten, Beats, Raster, Spotify, Kacheln</small></div><button class="set-btn primary" onclick="App.exportProject()">↓ JSON</button></div>
+      <div class="set-row"><div class="set-lbl">Projekt importieren<small>Einzel- oder Mehrprojekt-JSON</small></div><button class="set-btn" onclick="App.importProject()">↑ JSON</button></div>
+      <div class="set-row"><div class="set-lbl">Markdown importieren</div><button class="set-btn" onclick="App.importMD()">↑ .md</button></div>
+      <div class="set-row"><div class="set-lbl">Charaktere</div><div style="display:flex;gap:5px"><button class="set-btn" onclick="App.exportCharsJSON()">↓</button><button class="set-btn" onclick="App.importChars()">↑</button></div></div>
+      <div class="set-row"><div class="set-lbl">Orte</div><div style="display:flex;gap:5px"><button class="set-btn" onclick="App.exportLocsJSON()">↓</button><button class="set-btn" onclick="App.importLocs()">↑</button></div></div>
+      <div class="set-row"><div class="set-lbl">HTML/Word-Export</div><button class="set-btn" onclick="App.exportHTML()">↓ HTML</button></div>
+      <div class="set-row"><div class="set-lbl">Markdown-Export</div><button class="set-btn" onclick="App.exportMarkdown()">↓ MD</button></div>
+      <div class="set-row"><div class="set-lbl">Speicher-Info</div><button class="set-btn" onclick="Settings_storageInfo()">ℹ Anzeigen</button></div>
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">☁ Auto-Backup<small style="font-weight:normal;margin-left:8px;font-size:10px;opacity:.6">Chrome/Edge · lokal oder Google-Drive-Ordner</small></div>
+      ${(() => { try { const bs = AutoBackup.getStatus(); return `
+      <div class="set-row"><div class="set-lbl">Backup-Ordner<small>${bs.hasHandle ? 'Ordner aktiv — täglich automatisch' : 'Kein Ordner gewählt'}</small></div>
+        <div style="display:flex;gap:5px">
+          <button class="set-btn primary" onclick="AutoBackup.pickFolder()">${bs.hasHandle ? '⇄ Ändern' : '+ Ordner wählen'}</button>
+          ${bs.hasHandle ? '<button class="set-btn" onclick="AutoBackup.backup(false)">↓ Jetzt</button><button class="set-btn danger" onclick="AutoBackup.clearFolder()">✕</button>' : ''}
+        </div>
+      </div>
+      ${bs.last ? `<div class="set-row"><div class="set-lbl">Letztes Backup<small>${bs.last}</small></div></div>` : ''}
+      <div class="set-row" style="opacity:.55;font-size:10px;line-height:1.4"><div>Wähle einen lokalen Ordner (z.B. deinen Google-Drive- oder Dropbox-Ordner). Skriptorium schreibt täglich automatisch eine JSON-Sicherungsdatei dorthin — kein Cloud-Konto nötig.</div></div>
+      `; } catch(_) { return '<div class="set-row"><div class="set-lbl" style="opacity:.5">Auto-Backup nicht verfügbar<small>Nur Chrome/Edge mit File System API</small></div></div>'; } })()}
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">⚠ Daten-Wiederherstellung</div>
+      <div class="set-row" style="flex-wrap:wrap;gap:6px"><div class="set-lbl">Notfall-Assistent für fehlende Projekte.<small>Scannt alle IndexedDB-Keys.</small></div>
+        <button class="set-btn danger" onclick="App.showRecovery()">⚠ Assistent öffnen</button></div>
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">🔍 Fehler-Konsole</div>
+      <div class="set-row" style="flex-wrap:wrap;gap:6px">
+        <div class="set-lbl">JS-Fehler und Warnungen dieser Sitzung.<small>Automatisch ab Seitenstart erfasst.</small></div>
+        <div style="display:flex;gap:5px">
+          <button class="set-btn" onclick="ErrConsole.render(document.getElementById('err-console'))">↺</button>
+          <button class="set-btn danger" onclick="ErrConsole.clear();ErrConsole.render(document.getElementById('err-console'))">✕</button>
+        </div>
+      </div>
+      <div id="err-console" style="padding:4px 0"></div>
+    </div>
+    <div class="set-group">
+      <div class="set-group-hdr">ℹ Info</div>
+      <div class="set-row"><div class="set-lbl">Skriptorium</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3)">3.0 — Feb 2026</div></div>
+    </div>
+  </div>`;
+  try { ErrConsole.render(document.getElementById('err-console')); } catch(_) {}
 }
 
-function Settings_storageInfo() {
-  let used = 0;
-  for (let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('skriptorium'))used+=(localStorage.getItem(k)||'').length*2;}
-  const ps=(() => { try{return JSON.parse(localStorage.getItem('skriptorium.projects')||'[]');}catch(_){return[];} })();
-  const w=getAllScenes().reduce((a,{sc})=>a+countWords(sc.text||''),0);
-  showModal('<div class="modal-title">Speicher-Info</div>'+
-    '<div style="font-family:var(--mono);font-size:10px;line-height:2;color:var(--text2)">'+
-    'Projekte: <b style="color:var(--accent)">'+ps.length+'</b><br>'+
-    'W\u00f6rter: <b style="color:var(--accent)">'+fmtN(w)+'</b><br>'+
-    'localStorage: <b style="color:var(--accent)">'+(used/1024).toFixed(1)+' KB</b></div>'+
-    '<div class="modal-btns"><button class="mbtn primary" onclick="closeModal()">OK</button></div>');
-}
+// ── SCENE TEMPLATES ─────────────────────────────────────────────────────────────
+const SceneTemplates = (() => {
+  const TEMPLATES = [
+    { id:'dialog', name:'Dialogszene', func:'KOMMUNIKATION', desc:'Figuren im Gespräch, Konflikt durch Worte', summary:'Zwei Figuren treffen aufeinander. Was wird gesagt? Was verschwiegen?', notes:'Ziel: Was will jede Figur? Konflikt: Warum können sie es nicht direkt sagen?' },
+    { id:'conflict', name:'Konfliktszene', func:'WENDEPUNKT', desc:'Direkter Zusammenstoß oder innerer Kampf', summary:'Der Konflikt eskaliert. Etwas bricht oder wandelt sich.', notes:'Ziel, Hindernis, Konsequenz — wer verliert, wer gewinnt was?' },
+    { id:'reveal', name:'Enthüllung / Reveal', func:'INFORMATION', desc:'Ein Geheimnis kommt ans Licht', summary:'Was wird enthüllt? Für wen? Mit welcher Wirkung?', notes:'Wer weiß schon davon? Was verändert sich jetzt für die Figur?' },
+    { id:'romance', name:'Romance Beat', func:'BEZIEHUNG', desc:'Intimität, Annäherung oder Rückschlag in einer Beziehung', summary:'Die Beziehung zwischen den Figuren verändert sich.', notes:'Wie weit rücken sie zusammen oder auseinander? Was fühlt die POV-Figur?' },
+    { id:'action', name:'Action Beat', func:'SPANNUNG', desc:'Körperliche oder dramatische Handlung', summary:'Die Szene explodiert in Aktivität. Tempo hoch.', notes:'Was steht auf dem Spiel? Wer oder was ist in Gefahr? Wie endet es?' },
+    { id:'introspection', name:'Innerer Monolog', func:'CHARAKTER', desc:'Die Figur denkt, zweifelt, erkennt', summary:'Die Welt hält inne. Die Figur kehrt nach innen.', notes:'Welche Überzeugung wird in Frage gestellt? Was erkennt die Figur?' },
+    { id:'world', name:'Weltenbau-Szene', func:'HINTERGRUND', desc:'Kontext, Atmosphäre, Welt zeigen', summary:'Die Welt lebt. Der Leser sieht, hört, riecht.', notes:'Was macht diese Welt einzigartig? Show, don\'t tell.' },
+    { id:'transition', name:'Übergangsszene', func:'TEMPO', desc:'Zeitsprung, Ortswechsel, Atemholen', summary:'Die Handlung verlagert sich. Zeit oder Ort ändert sich.', notes:'Was hat sich bis hierher geändert? Wohin geht es als nächstes?' },
+  ];
+  return {
+    list: () => TEMPLATES,
+    get: id => TEMPLATES.find(t=>t.id===id)
+  };
+})();
+
+// ── KACHELN ──────────────────────────────────────────────────────────────────────
+const Kacheln = (() => {
+  const uid = () => 'k'+Math.random().toString(36).slice(2,10);
+  let _view = 'beats';
+  let _boardId = null;
+
+  function getKacheln() {
+    if (!state.planner) state.planner = { cards:[], order:{} };
+    if (!state.planner.cards) state.planner.cards = [];
+    return state.planner.cards.filter(c => c._kachel);
+  }
+
+  function init() {
+    // Set board from state or first available
+    const bs = typeof Beats !== 'undefined' ? (Beats._getState ? Beats._getState() : null) : null;
+    const boards = bs ? bs.boards : [];
+    if (!_boardId && boards.length) _boardId = boards[0].id;
+    if (state.ui && state.ui.kachelnBoardId) _boardId = state.ui.kachelnBoardId;
+    if (state.ui && state.ui.kachelnView) _view = state.ui.kachelnView;
+    populateBoardSel(boards);
+    render();
+  }
+
+  function populateBoardSel(boards) {
+    const sel = document.getElementById('kacheln-board-sel');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Kein Beat-Board —</option>' +
+      boards.map(b=>`<option value="${b.id}"${b.id===_boardId?' selected':''}>${esc(b.name||'Board')}</option>`).join('');
+  }
+
+  function setBoard(id) {
+    _boardId = id;
+    if (state.ui) state.ui.kachelnBoardId = id;
+    saveState();
+    render();
+  }
+
+  function setView(v, btn) {
+    _view = v;
+    if (state.ui) state.ui.kachelnView = v;
+    document.querySelectorAll('.k-view-btn').forEach(b=>b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    else {
+      const el = document.getElementById('kv-'+v);
+      if (el) el.classList.add('active');
+    }
+    render();
+  }
+
+  function getBoardBeats() {
+    if (!_boardId) return { phases:[], beats:[] };
+    const bs = typeof Beats !== 'undefined' && Beats._getState ? Beats._getState() : null;
+    if (!bs) return { phases:[], beats:[] };
+    const board = bs.boards.find(b=>b.id===_boardId);
+    if (!board) return { phases:[], beats:[] };
+    return { phases: board.phases||[], beats: board.beats||[] };
+  }
+
+  function render() {
+    const body = document.getElementById('kacheln-body');
+    if (!body) return;
+    const kacheln = getKacheln();
+    const count = document.getElementById('kacheln-count');
+    if (count) count.textContent = kacheln.length + ' Kacheln';
+
+    if (_view === 'beats') renderBeatsView(body, kacheln);
+    else renderFreeView(body, kacheln);
+  }
+
+  function renderBeatsView(body, kacheln) {
+    const strands = getStrands();
+    const { phases, beats } = getBoardBeats();
+
+    if (!beats.length) {
+      body.innerHTML = `<div style="padding:40px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3)">
+        Kein Beat-Board gewählt oder leer. Bitte zuerst im Beats-Tab ein Board anlegen und Beats hinzufügen.
+        <br><br><button class="zoom-btn" onclick="App.switchTab('beats',document.querySelector('[data-tab=beats]'))">→ Zum Beats-Tab</button>
+      </div>`;
+      return;
+    }
+
+    // Table: rows = beats, cols = strands + "ohne Strang"
+    const cols = [...strands, { id:'none', label:'Ohne Strang', color:'#5c5550' }];
+
+    let html = `<table class="kacheln-table"><thead><tr>
+      <th class="beat-col">Beat</th>
+      ${cols.map(s=>`<th style="min-width:160px"><span style="width:8px;height:8px;border-radius:50%;background:${s.color};display:inline-block;margin-right:4px"></span>${esc(s.label||s.id)}</th>`).join('')}
+    </tr></thead><tbody>`;
+
+    // Group beats by phase
+    for (const phase of phases) {
+      const phaseBeats = beats.filter(b=>b.phaseId===phase.id);
+      if (!phaseBeats.length) continue;
+
+      // Phase header row
+      const phaseWeight = phase.weight || 0;
+      const phaseRange = phase.rangeStart !== undefined ? `${phase.rangeStart}–${phase.rangeEnd}%` : '';
+      html += `<tr><td colspan="${cols.length+1}" style="background:var(--bg2);padding:6px 10px;border:1px solid var(--border2)">
+        <span style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)">${esc(phase.name||'Phase')}</span>
+        ${phaseWeight?`<span style="font-family:var(--mono);font-size:8px;color:var(--text3);margin-left:8px">Anteil: ${phaseWeight}%</span>`:''}
+        ${phaseRange?`<span style="font-family:var(--mono);font-size:8px;color:var(--text3);margin-left:6px">Verortung: ${phaseRange}</span>`:''}
+      </td></tr>`;
+
+      for (const beat of phaseBeats) {
+        const beatWeight = beat.weight || 0;
+        const beatRangeStart = beat.rangeStart !== undefined ? beat.rangeStart : null;
+        const beatRangeEnd = beat.rangeEnd !== undefined ? beat.rangeEnd : null;
+
+        html += `<tr>
+          <td class="beat-cell">
+            <div class="kt-beat-name">${esc(beat.title||'Beat')}</div>
+            ${beat.note ? `<div class="kt-beat-meta">${esc(beat.note.slice(0,60))}${beat.note.length>60?'…':''}</div>` : ''}
+            <div class="kt-beat-weight">
+              ${beatWeight ? `<span class="kt-weight-tag">${beatWeight}%</span>` : ''}
+              ${beatRangeStart !== null ? `<span class="kt-range-tag">${beatRangeStart}–${beatRangeEnd}%</span>` : ''}
+            </div>
+            ${beatWeight ? `<div class="kt-pct-bar"><div class="kt-pct-fill" style="width:${Math.min(100,beatWeight*3)}%"></div></div>` : ''}
+          </td>
+          ${cols.map(strand => {
+            const cellKacheln = kacheln.filter(k=>k.beatId===beat.id && (k.strandId||'none')===(strand.id||'none'));
+            const chips = cellKacheln.map(k => renderChip(k, strand.color)).join('');
+            return `<td><div class="kacheln-cell" onclick="Kacheln.addKachel('${beat.id}','${strand.id||'none'}')" title="Kachel hinzufügen">${chips}<div class="kacheln-cell-add">＋</div></div></td>`;
+          }).join('')}
+        </tr>`;
+      }
+    }
+
+    html += '</tbody></table>';
+    body.innerHTML = html;
+    // Re-attach chip click handlers
+    body.querySelectorAll('.kachel-chip').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        openEditor(el.dataset.id);
+      });
+    });
+  }
+
+  function renderFreeView(body, kacheln) {
+    const strands = getStrands();
+    if (!kacheln.length) {
+      body.innerHTML = `<div style="padding:50px;text-align:center;color:var(--text3)">
+        <div style="font-size:32px;opacity:.2;margin-bottom:10px">◈</div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em">Noch keine Kacheln. Klick auf + Kachel oben rechts.</div>
+      </div>`;
+      return;
+    }
+
+    // Group by strand
+    const groups = {};
+    for (const k of kacheln) {
+      const sid = k.strandId || 'none';
+      if (!groups[sid]) groups[sid] = [];
+      groups[sid].push(k);
+    }
+
+    const allGroups = [...strands.map(s=>({...s})), {id:'none',label:'Ohne Strang',color:'#5c5550'}];
+    let html = '<div style="padding:14px;display:flex;flex-direction:column;gap:16px">';
+    for (const strand of allGroups) {
+      const group = groups[strand.id||'none'];
+      if (!group || !group.length) continue;
+      html += `<div>
+        <div style="font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:${strand.color};text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${strand.color}"></span>
+          ${esc(strand.label||strand.id)} <span style="color:var(--text3)">(${group.length})</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          ${group.map(k=>renderChip(k,strand.color)).join('')}
+        </div>
+      </div>`;
+    }
+    html += '</div>';
+    body.innerHTML = html;
+    body.querySelectorAll('.kachel-chip').forEach(el => {
+      el.addEventListener('click', e => { e.stopPropagation(); openEditor(el.dataset.id); });
+    });
+  }
+
+  function renderChip(k, strandColor) {
+    const sc = k.sceneId ? findScene(k.sceneId) : null;
+    const badges = [];
+    const kDate = k.date||k.datum||''; const kNote = k.note||k.notes||k.notiz||''; const kTitle = k.title||k.titel||'(ohne Titel)';
+    if (kDate) badges.push(`<span class="kbadge" style="background:var(--sd)">📅 ${kDate}</span>`);
+    if (k.ort) badges.push(`<span class="kbadge" style="background:#4a3f30">📍 ${esc(k.ort.slice(0,12))}</span>`);
+    if (sc) badges.push(`<span class="kbadge" style="background:var(--sk)">↗ Szene</span>`);
+    return `<div class="kachel-chip${sc?' linked-scene':''}" data-id="${k.id}" style="${sc?'border-left-color:'+strandColor:''}">
+      <div class="kachel-chip-title">${esc(kTitle)}</div>
+      ${kNote ? `<div class="kachel-chip-note">${esc(kNote.slice(0,50))}${kNote.length>50?'…':''}</div>` : ''}
+      ${badges.length ? `<div class="kachel-badges">${badges.join('')}</div>` : ''}
+    </div>`;
+  }
+
+  function addKachel(beatId, strandId) {
+    if (!state.planner) state.planner = { cards:[], order:{} };
+    if (!state.planner.cards) state.planner.cards = [];
+    if (!state.planner.order) state.planner.order = {};
+    const k = { id:uid(), _kachel:true, title:'', note:'', beatId:beatId||null,
+      strandId:strandId||'none', ort:'', date:'', dateManual:false, sceneId:null, status:'idea' };
+    state.planner.cards.push(k);
+    const sid = k.strandId || 'none';
+    if (!state.planner.order[sid]) state.planner.order[sid] = [];
+    state.planner.order[sid].push(k.id);
+    saveState();
+    openEditor(k.id);
+  }
+
+  function openEditor(id) {
+    const k = (state.planner?.cards||[]).find(x=>x.id===id);
+    if (!k) return;
+    const strands = getStrands();
+    const strandOpts = `<option value="none">Ohne Strang</option>` +
+      strands.map(s=>`<option value="${s.id}"${k.strandId===s.id?' selected':''}>${esc(s.label)}</option>`).join('');
+
+    // Build beat options from all boards
+    const bs = typeof Beats !== 'undefined' && Beats._getState ? Beats._getState() : null;
+    let beatOpts = '<option value="">— Kein Beat —</option>';
+    if (bs && bs.boards) {
+      for (const board of bs.boards) {
+        for (const beat of (board.beats||[])) {
+          beatOpts += `<option value="${beat.id}"${k.beatId===beat.id?' selected':''}>${esc(board.name)} › ${esc(beat.title||'Beat')}</option>`;
+        }
+      }
+    }
+
+    // Scene link
+    const allScenes = getAllScenes();
+    let sceneOpts = '<option value="">— Keine Szene verknüpfen —</option>';
+    for (const {vol,ch,sc} of allScenes) {
+      sceneOpts += `<option value="${sc.id}"${k.sceneId===sc.id?' selected':''}>${esc(vol.title)} › ${esc(ch.title)} › ${esc(sc.title)}</option>`;
+    }
+
+    showModal(`<div class="kachel-modal-title">Kachel bearbeiten</div>
+      <div class="kachel-form">
+        <div class="kf-group">
+          <label class="kf-lbl">Titel</label>
+          <input class="kf-inp" id="kf-titel" value="${esc(k.title||k.titel||'')}" placeholder="Idee / Szenenkonzept…">
+        </div>
+        <div class="kf-group">
+          <label class="kf-lbl">Notiz / Idee</label>
+          <textarea class="kf-ta" id="kf-notiz" rows="4" placeholder="Was passiert hier? Wozu dient diese Szene?">${esc(k.note||k.notes||k.notiz||'')}</textarea>
+        </div>
+        <div class="kf-row">
+          <div class="kf-group">
+            <label class="kf-lbl">Beat</label>
+            <select class="kf-sel" id="kf-beat">${beatOpts}</select>
+          </div>
+          <div class="kf-group">
+            <label class="kf-lbl">Strang</label>
+            <select class="kf-sel" id="kf-strand">${strandOpts}</select>
+          </div>
+        </div>
+        <div class="kf-row">
+          <div class="kf-group">
+            <label class="kf-lbl">Ort</label>
+            <input class="kf-inp" id="kf-ort" value="${esc(k.ort)}" placeholder="Wo findet es statt?"
+              list="kf-ort-list" autocomplete="off">
+            <datalist id="kf-ort-list">${getAllLocations().map(l=>`<option value="${esc(l)}">`).join('')}</datalist>
+          </div>
+          <div class="kf-group">
+            <label class="kf-lbl">Datum / Zeit</label>
+            <input class="kf-inp" id="kf-datum" value="${esc(k.date||k.datum||'')}" placeholder="YYYY-MM-DD oder freier Text">
+          </div>
+        </div>
+        <div class="kf-group">
+          <label class="kf-lbl">Verknüpfte Szene</label>
+          <select class="kf-sel" id="kf-scene">${sceneOpts}</select>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="mbtn danger" onclick="Kacheln.deleteKachel('${id}')">Löschen</button>
+        <button class="mbtn" onclick="closeModal()">Abbrechen</button>
+        <button class="mbtn primary" onclick="Kacheln.saveKachel('${id}')">Speichern</button>
+      </div>`, b => b.querySelector('#kf-titel').focus());
+  }
+
+  function saveKachel(id) {
+    const k = (state.planner?.cards||[]).find(x=>x.id===id);
+    if (!k) return;
+    const oldStrand = k.strandId || 'none';
+    k.title = document.getElementById('kf-titel').value.trim();
+    k.note = document.getElementById('kf-notiz').value.trim();
+    k.beatId = document.getElementById('kf-beat').value || null;
+    k.strandId = document.getElementById('kf-strand').value || 'none';
+    k.ort = document.getElementById('kf-ort').value.trim();
+    const dv = document.getElementById('kf-datum').value.trim();
+    k.date = dv; k.dateManual = !!dv;
+    k.sceneId = document.getElementById('kf-scene').value || null;
+    // Sync planner order on strand change
+    const newStrand = k.strandId || 'none';
+    if (!state.planner.order) state.planner.order = {};
+    if (oldStrand !== newStrand) {
+      if (state.planner.order[oldStrand])
+        state.planner.order[oldStrand] = state.planner.order[oldStrand].filter(x=>x!==k.id);
+      if (!state.planner.order[newStrand]) state.planner.order[newStrand] = [];
+      if (!state.planner.order[newStrand].includes(k.id)) state.planner.order[newStrand].push(k.id);
+    } else {
+      if (!state.planner.order[newStrand]) state.planner.order[newStrand] = [];
+      if (!state.planner.order[newStrand].includes(k.id)) state.planner.order[newStrand].push(k.id);
+    }
+    saveState();
+    closeModal();
+    render();
+    toast('Kachel gespeichert','ok');
+  }
+
+  function deleteKachel(id) {
+    if (state.planner?.cards) state.planner.cards = state.planner.cards.filter(x=>x.id!==id);
+    saveState();
+    closeModal();
+    render();
+    toast('Kachel gelöscht','ok');
+  }
+
+  return { init, setBoard, setView, addKachel, openEditor, saveKachel, deleteKachel, render };
+})();
+window.Kacheln = Kacheln;
+
+// ── CHARACTER RELATIONSHIP GRAPH ─────────────────────────────────────────────────
+const RelGraph = (() => {
+  let nodes = [], edges = [];
+  let drag = null, pan = {x:0,y:0}, scale = 1;
+  let mouseDown = false, mouseStart = null, panStart = null;
+
+  const uid = () => 'r'+Math.random().toString(36).slice(2,10);
+
+  function getRelations() {
+    return state._relations || (state._relations = []);
+  }
+
+  function autoLayout() {
+    const chars = state.characters || [];
+    const cx = 400, cy = 180;
+    const r = Math.min(150, 50 + chars.length * 15);
+    chars.forEach((c,i) => {
+      const angle = (i / chars.length) * Math.PI * 2 - Math.PI/2;
+      c._gx = cx + Math.cos(angle) * r;
+      c._gy = cy + Math.sin(angle) * r;
+    });
+    saveState();
+    draw();
+  }
+
+  function init() {
+    const canvas = document.getElementById('rel-canvas');
+    if (!canvas) return;
+    const wrap = document.getElementById('rel-graph-wrap');
+    if (!wrap) return;
+    canvas.width = wrap.clientWidth || 800;
+    canvas.height = wrap.clientHeight || 360;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+
+    // Initialize node positions
+    const chars = state.characters || [];
+    chars.forEach((c,i) => {
+      if (c._gx === undefined) {
+        const angle = (i / Math.max(chars.length,1)) * Math.PI * 2 - Math.PI/2;
+        const r = Math.min(canvas.height/2-40, 40 + chars.length*18);
+        c._gx = canvas.width/2 + Math.cos(angle)*r;
+        c._gy = canvas.height/2 + Math.sin(angle)*r;
+      }
+    });
+
+    canvas.addEventListener('mousedown', onMouseDown);
+    canvas.addEventListener('mousemove', onMouseMove);
+    canvas.addEventListener('mouseup', onMouseUp);
+    canvas.addEventListener('mouseleave', onMouseUp);
+    canvas.addEventListener('wheel', onWheel, {passive:true});
+
+    renderRelList();
+    draw();
+  }
+
+  function draw() {
+    const canvas = document.getElementById('rel-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.save();
+    ctx.translate(pan.x, pan.y);
+    ctx.scale(scale, scale);
+
+    const chars = state.characters||[];
+    const rels = getRelations();
+
+    // Draw edges
+    for (const rel of rels) {
+      const a = chars.find(c=>c.id===rel.from);
+      const b = chars.find(c=>c.id===rel.to);
+      if (!a||!b) continue;
+      ctx.beginPath();
+      ctx.moveTo(a._gx||100, a._gy||100);
+      ctx.lineTo(b._gx||200, b._gy||100);
+      ctx.strokeStyle = rel.color || '#5c5550';
+      ctx.lineWidth = rel.weight||1;
+      ctx.setLineDash(rel.dashed?[4,3]:[]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      // Edge label
+      if (rel.label) {
+        const mx = ((a._gx||100)+(b._gx||200))/2;
+        const my = ((a._gy||100)+(b._gy||100))/2;
+        ctx.fillStyle = '#a09890';
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(rel.label, mx, my-4);
+      }
+    }
+
+    // Draw nodes
+    for (const c of chars) {
+      const x = c._gx||150, y = c._gy||150;
+      const R = 22;
+      ctx.beginPath();
+      ctx.arc(x, y, R, 0, Math.PI*2);
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fill();
+      ctx.strokeStyle = c._gCol || '#c8a96e';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = '#e2ddd4';
+      ctx.font = 'bold 11px Georgia,serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const initials = ((c.name||c.callName||'?').split(' ').map(w=>w[0]).join('').toUpperCase()||'?').slice(0,2);
+      ctx.fillText(initials, x, y);
+      ctx.fillStyle = '#a09890';
+      ctx.font = '10px monospace';
+      ctx.textBaseline = 'top';
+      ctx.fillText((c.callName||c.name||'').slice(0,14), x, y+R+3);
+    }
+    ctx.restore();
+  }
+
+  function onMouseDown(e) {
+    const canvas = document.getElementById('rel-canvas');
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left - pan.x) / scale;
+    const my = (e.clientY - rect.top - pan.y) / scale;
+    const chars = state.characters||[];
+    for (const c of chars) {
+      const dx = (c._gx||0)-mx, dy = (c._gy||0)-my;
+      if (Math.sqrt(dx*dx+dy*dy)<24) { drag = c; return; }
+    }
+    mouseDown = true;
+    mouseStart = {x:e.clientX, y:e.clientY};
+    panStart = {...pan};
+  }
+  function onMouseMove(e) {
+    if (drag) {
+      const canvas = document.getElementById('rel-canvas');
+      const rect = canvas.getBoundingClientRect();
+      drag._gx = (e.clientX - rect.left - pan.x)/scale;
+      drag._gy = (e.clientY - rect.top - pan.y)/scale;
+      draw(); return;
+    }
+    if (mouseDown && mouseStart) {
+      pan.x = panStart.x + (e.clientX - mouseStart.x);
+      pan.y = panStart.y + (e.clientY - mouseStart.y);
+      draw();
+    }
+  }
+  function onMouseUp() {
+    if (drag) { saveState(); drag = null; }
+    mouseDown = false; mouseStart = null;
+  }
+  function onWheel(e) {
+    scale = Math.max(0.3, Math.min(3, scale - e.deltaY * 0.001));
+    draw();
+  }
+
+  function addRelation() {
+    const chars = state.characters||[];
+    if (chars.length < 2) { toast('Mindestens 2 Charaktere für Beziehungen benötigt','err'); return; }
+    const charOpts = chars.map(c=>`<option value="${c.id}">${esc(c.name||c.callName||'Charakter')}</option>`).join('');
+    const REL_TYPES = ['Freundschaft','Feindschaft','Liebe','Familie','Rivalität','Mentor','Verrat','Bündnis','Neutralität'];
+    const typeOpts = REL_TYPES.map(t=>`<option value="${t}">${t}</option>`).join('');
+    showModal(`<div class="modal-title">Beziehung hinzufügen</div>
+      <label class="modal-lbl">Von</label><select class="modal-inp" id="rel-from">${charOpts}</select>
+      <label class="modal-lbl">Nach</label><select class="modal-inp" id="rel-to">${charOpts}</select>
+      <label class="modal-lbl">Art</label><select class="modal-inp" id="rel-type">${typeOpts}</select>
+      <label class="modal-lbl">Beschreibung (optional)</label><input class="modal-inp" id="rel-label" placeholder="z.B. Seit Kindheit befreundet">
+      <div class="modal-btns"><button class="mbtn" onclick="closeModal()">Abbrechen</button>
+      <button class="mbtn primary" onclick="RelGraph.doAddRelation()">Hinzufügen</button></div>`);
+  }
+
+  function doAddRelation() {
+    const from = document.getElementById('rel-from').value;
+    const to = document.getElementById('rel-to').value;
+    const type = document.getElementById('rel-type').value;
+    const label = document.getElementById('rel-label').value.trim();
+    if (from === to) { toast('Beziehung muss zwischen verschiedenen Charakteren sein','err'); return; }
+    const COLORS = {Freundschaft:'#81b29a',Feindschaft:'#e07a5f',Liebe:'#c47fba',Familie:'#d4a373',Rivalität:'#f39c12',Mentor:'#6ba3d6',Verrat:'#e74c3c',Bündnis:'#2ecc71',Neutralität:'#5c5550'};
+    getRelations().push({id:uid(),from,to,type,label:label||type,color:COLORS[type]||'#5c5550',weight:2,dashed:type==='Neutralität'});
+    saveState(); closeModal();
+    renderRelList(); draw();
+    toast('Beziehung hinzugefügt','ok');
+  }
+
+  function renderRelList() {
+    const list = document.getElementById('rel-rel-list');
+    if (!list) return;
+    const rels = getRelations();
+    const chars = state.characters||[];
+    if (!rels.length) { list.innerHTML = '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);padding:6px">Noch keine Beziehungen definiert.</div>'; return; }
+    list.innerHTML = rels.map(r=>{
+      const a = chars.find(c=>c.id===r.from);
+      const b = chars.find(c=>c.id===r.to);
+      return `<div class="rel-rel-item">
+        <span class="rel-rel-tag" style="background:${r.color}20;color:${r.color}">${esc(r.type||'—')}</span>
+        <span class="rel-rel-label">${esc((a&&(a.callName||a.name))||'?')} ↔ ${esc((b&&(b.callName||b.name))||'?')}: ${esc(r.label||'')}</span>
+        <button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px" onclick="RelGraph.deleteRelation('${r.id}')" title="Entfernen">✕</button>
+      </div>`;
+    }).join('');
+  }
+
+  function deleteRelation(id) {
+    state._relations = getRelations().filter(r=>r.id!==id);
+    saveState(); renderRelList(); draw();
+  }
+
+  return { init, autoLayout, addRelation, doAddRelation, deleteRelation, renderRelList };
+})();
+window.RelGraph = RelGraph;
+
+// ── SPLIT VIEW ────────────────────────────────────────────────────────────────────
+const SplitView = (() => {
+  function buildOptions(selId) {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Szene wählen —</option>';
+    for (const {vol,ch,sc} of getAllScenes()) {
+      const opt = document.createElement('option');
+      opt.value = sc.id;
+      opt.textContent = `${vol.title} › ${ch.title} › ${sc.title}`;
+      if (sc.id === cur) opt.selected = true;
+      sel.appendChild(opt);
+    }
+  }
+  function init() {
+    buildOptions('split-sel-left');
+    buildOptions('split-sel-right');
+    load('left', document.getElementById('split-sel-left')?.value);
+    load('right', document.getElementById('split-sel-right')?.value);
+  }
+  function load(side, sceneId) {
+    const content = document.getElementById('split-content-'+side);
+    if (!content) return;
+    if (!sceneId) { content.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:10px;padding:20px">Szene wählen…</div>'; return; }
+    const f = findScene(sceneId);
+    if (!f) { content.innerHTML = '<div style="color:var(--text3);font-family:var(--mono);font-size:10px;padding:20px">Szene nicht gefunden.</div>'; return; }
+    content.innerHTML = `
+      <div class="split-pane-title">${esc(f.sc.title)}</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin:-4px 0 8px">${esc(f.vol.title)} › ${esc(f.ch.title)} · ${countWords(f.sc.text||0)} Wörter</div>
+      ${f.sc.summary ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text2);padding:6px 0;border-bottom:1px solid var(--border);margin-bottom:8px">${esc(f.sc.summary)}</div>` : ''}
+      <div class="split-pane-text">${esc(f.sc.text||'')}</div>`;
+  }
+  return { init, load };
+})();
+window.SplitView = SplitView;
+
+// ── POMODORO TIMER ─────────────────────────────────────────────────────────────
+const Pomodoro = (() => {
+  let _interval = null;
+  let _seconds = 25*60;
+  let _running = false;
+  let _mode = 'idle'; // idle, work, rest
+  let _workMins = 25;
+  let _restMins = 5;
+
+  function display() {
+    const el = document.getElementById('pomo-display');
+    if (!el) return;
+    const m = Math.floor(_seconds/60).toString().padStart(2,'0');
+    const s = (_seconds%60).toString().padStart(2,'0');
+    const icon = _running ? '⏸' : '▶';
+    el.textContent = icon + ' ' + m+':'+s;
+    el.className = 'pomo-display';
+    if (_mode==='work') el.classList.add(_seconds<60?'urgent':'work');
+    else if (_mode==='rest') el.classList.add('rest');
+    if (_running) el.title = 'Läuft – Klicken zum Pausieren';
+    else if (_mode==='idle') el.title = '▶ Klicken zum Starten';
+    else el.title = '▶ Klicken zum Fortsetzen';
+  }
+
+  function toggle() {
+    if (_mode==='idle') { _mode='work'; _seconds=_workMins*60; }
+    _running = !_running;
+    if (_running) {
+      _interval = setInterval(() => {
+        _seconds--;
+        display();
+        if (_seconds<=0) {
+          clearInterval(_interval); _running=false;
+          if (_mode==='work') {
+            _mode='rest'; _seconds=_restMins*60;
+            toast('🍅 Sprint beendet! Pause: '+_restMins+' Minuten','ok');
+            try{new Notification('Skriptorium',{body:'Sprint beendet! Zeit für eine Pause.'});}catch(_){}
+          } else {
+            _mode='idle'; _seconds=_workMins*60;
+            toast('☕ Pause vorbei! Bereit für den nächsten Sprint?','ok');
+          }
+          display();
+        }
+      }, 1000);
+    } else {
+      clearInterval(_interval);
+    }
+    display();
+  }
+
+  function reset() {
+    clearInterval(_interval); _running=false; _mode='idle'; _seconds=_workMins*60; display();
+  }
+
+  function settings() {
+    showModal(`<div class="modal-title">Sprint-Timer Einstellungen</div>
+      <label class="modal-lbl">Arbeitszeit (Minuten)</label>
+      <input class="modal-inp" id="pm-work" type="number" min="1" max="120" value="${_workMins}">
+      <label class="modal-lbl">Pausenzeit (Minuten)</label>
+      <input class="modal-inp" id="pm-rest" type="number" min="1" max="60" value="${_restMins}">
+      <div class="modal-btns"><button class="mbtn" onclick="closeModal()">Abbrechen</button>
+      <button class="mbtn primary" onclick="Pomodoro._saveSettings()">Speichern</button></div>`);
+  }
+
+  function _saveSettings() {
+    _workMins = Math.max(1,Math.min(120,+document.getElementById('pm-work').value||25));
+    _restMins = Math.max(1,Math.min(60,+document.getElementById('pm-rest').value||5));
+    reset(); closeModal();
+    toast('Timer eingestellt: '+_workMins+' / '+_restMins+' Min','ok');
+  }
+
+  display();
+  return { toggle, reset, settings, _saveSettings };
+})();
+window.Pomodoro = Pomodoro;
 
 
 init();
 </script>
+
+<!-- PLANUNGSNOTIZ EDITOR -->
+<div id="kn-overlay" style="position:fixed;inset:0;z-index:2500;background:rgba(0,0,0,.55)" onclick="if(event.target===this)BeatNotizen.closeEditor()">
+  <div id="kn-panel" style="position:absolute;right:0;top:0;bottom:0;width:min(600px,96vw);background:var(--bg1);border-left:1px solid var(--border2);display:flex;flex-direction:column;overflow:hidden;animation:kn-in .15s ease">
+    <div style="padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <span id="kn-editor-title" style="font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);flex:1">Planungsnotiz</span>
+      <button style="font-family:var(--mono);font-size:10px;background:none;border:1px solid var(--border2);color:var(--text3);padding:3px 12px;cursor:pointer" onclick="BeatNotizen.closeEditor()">Schließen</button>
+    </div>
+    <div id="kn-body" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+    <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <button id="kn-del-btn" style="font-family:var(--mono);font-size:10px;background:none;border:1px solid rgba(114,28,36,.6);color:#fc8181;padding:5px 14px;cursor:pointer" onclick="BeatNotizen.deleteKachel()">Kachel löschen</button>
+      <span style="flex:1"></span>
+      <button style="font-family:var(--mono);font-size:10px;background:none;border:1px solid var(--border2);color:var(--text2);padding:5px 14px;cursor:pointer" onclick="BeatNotizen.closeEditor()">Abbrechen</button>
+      <button style="font-family:var(--mono);font-size:10px;background:none;border:1px solid var(--accent2);color:var(--accent);padding:5px 14px;cursor:pointer" onclick="BeatNotizen.saveKachel()">Speichern</button>
+    </div>
+  </div>
+</div>
+<style>
+  #kn-overlay { display: none; }
+  #kn-overlay.open{display:flex}
+  @keyframes kn-in{from{transform:translateX(30px);opacity:.5}to{transform:translateX(0);opacity:1}}
+</style>
 </body>
 </html>
