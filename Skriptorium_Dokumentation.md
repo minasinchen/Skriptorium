@@ -1,6 +1,6 @@
 # Skriptorium - Projektdokumentation
 
-Stand: 28.02.2026
+Stand: 03.03.2026
 
 ---
 
@@ -45,6 +45,12 @@ Zusaetzlich:
 - Fokus-Modus fuer ablenkungsarmes Schreiben
 - Szenen duplizieren
 - Verknuepfung mit Planer-Elementen
+- Szenenplanung mit ausgeklapptem Prompt-Bereich
+- Ton-Presets plus freier Ton-Zusatz
+- Projektweites Standard-Tempus mit optionalem Szenen-Override
+- Mehrere Szenentypen mit Leitfeldern (z. B. Szene, Sequel, Konfrontation, Enthuellung, emotionale Szene, Uebergang)
+- Freie KI-Notiz pro Szene
+- KI-Prompt mit Projektsprache, Projektart und Projekt-Kurzprofil
 
 ## 3. Korkboard
 
@@ -61,12 +67,14 @@ Zusaetzlich:
 
 - Eigene Charakterlisten
 - Bearbeitbare Detailansichten je Figur
+- Uebernahme einzelner Charaktere aus anderen Projekten
 
 ## 6. Orte und Tags
 
 - Verwaltung von Orten
 - Nutzung von Orten und Tags in Szenen
 - Ortsdaten koennen mit der Weltkarte kombiniert werden
+- Uebernahme einzelner Orte aus anderen Projekten
 
 ## 7. Planer
 
@@ -85,6 +93,9 @@ Zusaetzlich:
 - JSON-Export und -Import pro Beat-Planung
 - Verknuepfung einzelner Beats mit Szenen
 - Uebersicht fuer Planungsmethoden
+- Beat-Notizen-Ansicht mit inhaltlicher Kurz-Hilfe pro Beat
+- Fortschrittsanzeige pro Beat auf Basis verknuepfter Szenenwoerter
+- Zentrales Modal fuer Beat-Notizen statt Seitenleiste
 
 ## 9. Raster / Story-Chronik
 
@@ -140,10 +151,23 @@ Funktionen:
 - Projekte umbenennen
 - Projekte loeschen (Hauptprojekt geschuetzt)
 - Eigenes Buchcover pro Projekt
+- Projektsprache fuer Prompt-Generator
+- Projektart (z. B. Roman, Novelle, Fanfiction)
+- Projekt-Kurzprofil fuer Inhalt, Atmosphaere und Stil
+- Charaktere und Orte koennen projektuebergreifend uebernommen werden
 
 ## 16. Einstellungen
 
 Der Einstellungsbereich buendelt Darstellung, Sicherung und Diagnose.
+
+### Projekt-Kontext
+
+- Sprache fuer Prompt-Generator und Szenenplanung
+- Standard-Tempus fuer Szenen (projektweit)
+- Genre
+- Projektart
+- Projekt-Kurzprofil (1-2 Saetze fuer Inhalt, Stil und Atmosphaere)
+- Projektspezifisches Schreibziel
 
 ### Schrift und Darstellung
 
@@ -237,4 +261,3 @@ Je nach Bereich stehen zusaetzlich spezialisierte Exporte zur Verfuegung:
 
 - In der Anwendung und in aelteren Dokumentationsstaenden tauchen unterschiedliche Versionsnummern auf.
 - Wenn eine feste Release-Version gepflegt werden soll, sollte sie zentral vereinheitlicht werden.
-
